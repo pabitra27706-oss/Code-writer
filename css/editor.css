@@ -1,0 +1,373 @@
+/* =============================================
+   EDITOR.CSS — VS Code-style Editor Appearance
+   ============================================= */
+
+/* ---------- Editor Window ---------- */
+.editor-window {
+    width: 100%;
+    max-width: 800px;
+    background: #1a1b26;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.3),
+        0 10px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+/* ---------- Title Bar ---------- */
+.editor-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 38px;
+    padding: 0 14px;
+    background: #16161e;
+    border-bottom: 1px solid #101014;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.window-dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: opacity var(--transition);
+}
+
+.dot-red {
+    background: #f85149;
+}
+
+.dot-yellow {
+    background: #d29922;
+}
+
+.dot-green {
+    background: #3fb950;
+}
+
+.dot:hover {
+    opacity: 0.8;
+}
+
+.window-title {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.window-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.win-btn {
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: default;
+    opacity: 0.5;
+}
+
+/* ---------- Tab Bar ---------- */
+.editor-tabs {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    background: #16161e;
+    border-bottom: 1px solid #101014;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.editor-tabs::-webkit-scrollbar {
+    height: 0;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    padding: 0 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-right: 1px solid #101014;
+    white-space: nowrap;
+    user-select: none;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.tab.active {
+    background: #1a1b26;
+    color: var(--text-primary);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-blue);
+}
+
+.tab-icon {
+    font-size: 14px;
+}
+
+.tab-close {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.tab:hover .tab-close {
+    opacity: 1;
+}
+
+/* ---------- Editor Body ---------- */
+.editor-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #1a1b26;
+    min-height: 200px;
+    max-height: 50vh;
+    transition: max-height 0.3s ease;
+}
+
+/* Custom Scrollbar */
+.editor-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.editor-body::-webkit-scrollbar-track {
+    background: #1a1b26;
+}
+
+.editor-body::-webkit-scrollbar-thumb {
+    background: #2f3352;
+    border-radius: 5px;
+    border: 2px solid #1a1b26;
+}
+
+.editor-body::-webkit-scrollbar-thumb:hover {
+    background: #3b3f5c;
+}
+
+/* ---------- Code Area ---------- */
+.code-area {
+    padding: 12px 0;
+    min-height: 100%;
+}
+
+/* ---------- Code Line ---------- */
+.code-line {
+    display: flex;
+    align-items: flex-start;
+    min-height: 24px;
+    line-height: 24px;
+    padding: 0 16px 0 0;
+}
+
+.code-line:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ---------- Line Number ---------- */
+.line-number {
+    display: inline-block;
+    width: 50px;
+    min-width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: #363b54;
+    user-select: none;
+    flex-shrink: 0;
+    line-height: 24px;
+}
+
+.code-line:hover .line-number {
+    color: #565f89;
+}
+
+/* ---------- Line Content ---------- */
+.line-content {
+    flex: 1;
+    font-family: var(--font-code);
+    font-size: 13.5px;
+    color: #a9b1d6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 24px;
+    min-height: 24px;
+}
+
+/* ---------- Cursor ---------- */
+.cursor {
+    color: #c0caf5;
+    font-weight: 400;
+    animation: none;
+}
+
+.cursor.blink {
+    animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ---------- Status Bar ---------- */
+.editor-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 24px;
+    padding: 0 12px;
+    background: #16161e;
+    border-top: 1px solid #101014;
+    font-size: 11px;
+    color: var(--text-muted);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.status-left,
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.status-item {
+    white-space: nowrap;
+}
+
+/* ---- Highlight.js Overrides for Editor ---- */
+.line-content .hljs-keyword {
+    color: #bb9af7;
+}
+
+.line-content .hljs-string {
+    color: #9ece6a;
+}
+
+.line-content .hljs-number {
+    color: #ff9e64;
+}
+
+.line-content .hljs-comment {
+    color: #565f89;
+    font-style: italic;
+}
+
+.line-content .hljs-function {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-title {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-built_in {
+    color: #e0af68;
+}
+
+.line-content .hljs-literal {
+    color: #ff9e64;
+}
+
+.line-content .hljs-type {
+    color: #2ac3de;
+}
+
+.line-content .hljs-params {
+    color: #e0af68;
+}
+
+.line-content .hljs-meta {
+    color: #89ddff;
+}
+
+.line-content .hljs-attr {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-attribute {
+    color: #bb9af7;
+}
+
+.line-content .hljs-selector-tag {
+    color: #f7768e;
+}
+
+.line-content .hljs-selector-class {
+    color: #9ece6a;
+}
+
+.line-content .hljs-selector-id {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-variable {
+    color: #c0caf5;
+}
+
+.line-content .hljs-template-variable {
+    color: #7dcfff;
+}
+
+.line-content .hljs-tag {
+    color: #f7768e;
+}
+
+.line-content .hljs-name {
+    color: #f7768e;
+}
+
+.line-content .hljs-operator {
+    color: #89ddff;
+}
+
+.line-content .hljs-property {
+    color: #73daca;
+}
+
+.line-content .hljs-punctuation {
+    color: #89ddff;
+}
+
+.line-content .hljs-regexp {
+    color: #b4f9f8;
+}
+
+.line-content .hljs-symbol {
+    color: #bb9af7;
+}
+
+.line-content .hljs-subst {
+    color: #c0caf5;
+}

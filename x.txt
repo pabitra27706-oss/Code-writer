@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeType Studio</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Highlight.js - Tokyo Night Dark Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Our CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+    <div class="app-container" id="appContainer">
+
+        <!-- ========== INPUT PANEL ========== -->
+        <div class="input-panel" id="inputPanel">
+
+            <!-- Logo -->
+            <div class="logo">
+                <span class="logo-icon">⌨️</span>
+                <span class="logo-text">CodeType <span class="logo-highlight">Studio</span></span>
+            </div>
+
+            <!-- Code Input -->
+            <div class="input-group">
+                <label for="codeInput">Your Code</label>
+                <textarea id="codeInput" placeholder="Paste your code here..." spellcheck="false">function greet(name) {
+    const message = `Hello, ${name}!`;
+    console.log(message);
+
+    if (name === "World") {
+        console.log("Welcome to CodeType Studio!");
+        console.log("Create amazing typing animations.");
+    }
+
+    return message;
+}
+
+// Call the function
+const result = greet("World");
+console.log(result);</textarea>
+            </div>
+
+            <!-- Settings Row -->
+            <div class="settings-row">
+                <!-- Language -->
+                <div class="input-group half">
+                    <label for="languageSelect">Language</label>
+                    <select id="languageSelect">
+                        <option value="javascript" selected>JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                        <option value="c">C</option>
+                        <option value="csharp">C#</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="php">PHP</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                        <option value="swift">Swift</option>
+                        <option value="kotlin">Kotlin</option>
+                        <option value="dart">Dart</option>
+                        <option value="sql">SQL</option>
+                        <option value="bash">Bash</option>
+                        <option value="json">JSON</option>
+                        <option value="xml">XML</option>
+                        <option value="yaml">YAML</option>
+                        <option value="markdown">Markdown</option>
+                    </select>
+                </div>
+
+                <!-- File Name -->
+                <div class="input-group half">
+                    <label for="fileNameInput">File Name</label>
+                    <input type="text" id="fileNameInput" value="index.js" placeholder="main.py">
+                </div>
+            </div>
+
+            <!-- Speed -->
+            <div class="input-group">
+                <label for="speedSlider">
+                    Typing Speed: <span id="speedValue">40</span> chars/sec
+                </label>
+                <input type="range" id="speedSlider" min="5" max="200" value="40" step="1">
+                <div class="speed-labels">
+                    <span>🐢 Slow</span>
+                    <span>🐇 Fast</span>
+                </div>
+            </div>
+
+            <!-- Newline Delay -->
+            <div class="input-group">
+                <label for="newlineDelay">
+                    Newline Pause: <span id="newlineDelayValue">300</span> ms
+                </label>
+                <input type="range" id="newlineDelay" min="0" max="1000" value="300" step="50">
+                <div class="speed-labels">
+                    <span>None</span>
+                    <span>Long</span>
+                </div>
+            </div>
+
+            <!-- Humanize Toggle -->
+            <div class="input-group toggle-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="humanizeToggle" checked>
+                    <span class="toggle-switch"></span>
+                    <span>Humanized Typing (random delays)</span>
+                </label>
+            </div>
+
+            <!-- Sound Toggle -->
+            <div class="input-group toggle-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="soundToggle">
+                    <span class="toggle-switch"></span>
+                    <span>Keyboard Sound 🔊</span>
+                </label>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="control-buttons">
+                <button class="btn btn-play" id="btnPlay">
+                    <span class="btn-icon" id="playIcon">▶</span>
+                    <span id="playText">Play</span>
+                </button>
+                <button class="btn btn-reset" id="btnReset">
+                    <span class="btn-icon">⟲</span>
+                    <span>Reset</span>
+                </button>
+                <button class="btn btn-fullscreen" id="btnFullscreen">
+                    <span class="btn-icon">⛶</span>
+                    <span>Fullscreen</span>
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+                <span class="progress-text" id="progressText">0%</span>
+            </div>
+
+        </div>
+
+        <!-- ========== OUTPUT PANEL ========== -->
+        <div class="output-panel" id="outputPanel">
+
+            <div class="editor-window" id="editorWindow">
+
+                <!-- Title Bar -->
+                <div class="editor-titlebar">
+                    <div class="window-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="window-title" id="windowTitle">CodeType Studio</div>
+                    <div class="window-actions">
+                        <span class="win-btn">─</span>
+                        <span class="win-btn">□</span>
+                        <span class="win-btn">×</span>
+                    </div>
+                </div>
+
+                <!-- Tab Bar -->
+                <div class="editor-tabs">
+                    <div class="tab active" id="editorTab">
+                        <span class="tab-icon" id="tabIcon">📄</span>
+                        <span class="tab-name" id="tabName">index.js</span>
+                        <span class="tab-close">×</span>
+                    </div>
+                </div>
+
+                <!-- Code Area -->
+                <div class="editor-body" id="editorBody">
+                    <div class="code-area" id="codeArea">
+                        <!-- Lines will be injected here -->
+                        <div class="code-line" data-line="1">
+                            <span class="line-number">1</span>
+                            <span class="line-content"><span class="cursor blink">█</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="editor-statusbar">
+                    <div class="status-left">
+                        <span class="status-item" id="statusLanguage">JavaScript</span>
+                        <span class="status-item">UTF-8</span>
+                    </div>
+                    <div class="status-right">
+                        <span class="status-item" id="statusPosition">Ln 1, Col 1</span>
+                        <span class="status-item">Spaces: 4</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Exit Fullscreen Button (hidden by default) -->
+            <button class="btn-exit-fullscreen" id="btnExitFullscreen">
+                ✕ Exit Fullscreen (ESC)
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Our JS -->
+    <script src="js/highlight-parser.js"></script>
+    <script src="js/editor-ui.js"></script>
+    <script src="js/typing-engine.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
+
+/* =============================================
+   STYLE.CSS — Base Layout, Controls, Theme
+   ============================================= */
+
+/* ---------- CSS Variables ---------- */
+:root {
+    /* Background & Surfaces */
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #1c2333;
+    --bg-input: #0d1117;
+    --bg-hover: #21262d;
+
+    /* Text */
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+
+    /* Accent */
+    --accent-blue: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-red: #f85149;
+    --accent-yellow: #d29922;
+    --accent-purple: #bc8cff;
+    --accent-cyan: #76e3ea;
+
+    /* Borders */
+    --border-color: #30363d;
+    --border-light: #21262d;
+
+    /* Misc */
+    --radius: 8px;
+    --radius-lg: 12px;
+    --transition: 0.2s ease;
+    --font-ui: 'Inter', -apple-system, sans-serif;
+    --font-code: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-ui);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- App Container ---------- */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* ---------- INPUT PANEL ---------- */
+.input-panel {
+    width: 380px;
+    min-width: 340px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* Scrollbar */
+.input-panel::-webkit-scrollbar {
+    width: 6px;
+}
+.input-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+.input-panel::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* ---------- Logo ---------- */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+    font-size: 28px;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.logo-highlight {
+    color: var(--accent-blue);
+}
+
+/* ---------- Input Groups ---------- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-group textarea {
+    width: 100%;
+    min-height: 200px;
+    max-height: 400px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color var(--transition);
+    tab-size: 4;
+}
+
+.input-group textarea:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+.input-group input[type="text"] {
+    width: 100%;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.input-group input[type="text"]:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+.input-group select {
+    width: 100%;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color var(--transition);
+}
+
+.input-group select:focus {
+    border-color: var(--accent-blue);
+}
+
+/* Settings Row */
+.settings-row {
+    display: flex;
+    gap: 12px;
+}
+
+.settings-row .half {
+    flex: 1;
+}
+
+/* ---------- Range Slider ---------- */
+.input-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    cursor: pointer;
+    border: 2px solid var(--bg-secondary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform var(--transition);
+}
+
+.input-group input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.input-group input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    cursor: pointer;
+    border: 2px solid var(--bg-secondary);
+}
+
+.speed-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* ---------- Toggle Switch ---------- */
+.toggle-group {
+    flex-direction: row !important;
+    align-items: center;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-switch {
+    width: 40px;
+    height: 22px;
+    background: var(--border-color);
+    border-radius: 11px;
+    position: relative;
+    transition: background var(--transition);
+    flex-shrink: 0;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    transition: all var(--transition);
+}
+
+.toggle-label input:checked + .toggle-switch {
+    background: var(--accent-blue);
+}
+
+.toggle-label input:checked + .toggle-switch::after {
+    left: 21px;
+    background: white;
+}
+
+/* ---------- Control Buttons ---------- */
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    user-select: none;
+    flex: 1;
+    min-width: 100px;
+}
+
+.btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-muted);
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+.btn-play {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+.btn-play:hover {
+    background: #4393e6;
+    border-color: #4393e6;
+}
+
+.btn-play.paused {
+    background: var(--accent-yellow);
+    border-color: var(--accent-yellow);
+    color: #000;
+}
+
+.btn-reset {
+    background: var(--bg-tertiary);
+}
+
+.btn-fullscreen {
+    background: var(--bg-tertiary);
+}
+
+/* ---------- Progress Bar ---------- */
+.progress-container {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: var(--bg-input);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    display: none;
+}
+
+.progress-container.active {
+    display: block;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    border-radius: 12px;
+    transition: width 0.1s linear;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ---------- OUTPUT PANEL ---------- */
+.output-panel {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 30px;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ---------- Exit Fullscreen Button ---------- */
+.btn-exit-fullscreen {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+    opacity: 0.5;
+}
+
+.btn-exit-fullscreen:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Fullscreen state */
+.app-container.fullscreen .input-panel {
+    display: none;
+}
+
+.app-container.fullscreen .output-panel {
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.app-container.fullscreen .editor-window {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    border-radius: 0;
+    border: none;
+}
+
+.app-container.fullscreen .editor-body {
+    max-height: none !important;
+    height: calc(100vh - 86px) !important;
+}
+
+.app-container.fullscreen .btn-exit-fullscreen {
+    display: block;
+}
+
+.app-container.fullscreen .editor-titlebar {
+    border-radius: 0;
+}
+
+
+/* =============================================
+   EDITOR.CSS — VS Code-style Editor Appearance
+   ============================================= */
+
+/* ---------- Editor Window ---------- */
+.editor-window {
+    width: 100%;
+    max-width: 800px;
+    background: #1a1b26;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.3),
+        0 10px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+/* ---------- Title Bar ---------- */
+.editor-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 38px;
+    padding: 0 14px;
+    background: #16161e;
+    border-bottom: 1px solid #101014;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.window-dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: opacity var(--transition);
+}
+
+.dot-red {
+    background: #f85149;
+}
+
+.dot-yellow {
+    background: #d29922;
+}
+
+.dot-green {
+    background: #3fb950;
+}
+
+.dot:hover {
+    opacity: 0.8;
+}
+
+.window-title {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.window-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.win-btn {
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: default;
+    opacity: 0.5;
+}
+
+/* ---------- Tab Bar ---------- */
+.editor-tabs {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    background: #16161e;
+    border-bottom: 1px solid #101014;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.editor-tabs::-webkit-scrollbar {
+    height: 0;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    padding: 0 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-right: 1px solid #101014;
+    white-space: nowrap;
+    user-select: none;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.tab.active {
+    background: #1a1b26;
+    color: var(--text-primary);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-blue);
+}
+
+.tab-icon {
+    font-size: 14px;
+}
+
+.tab-close {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.tab:hover .tab-close {
+    opacity: 1;
+}
+
+/* ---------- Editor Body ---------- */
+.editor-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #1a1b26;
+    min-height: 200px;
+    max-height: 50vh;
+    transition: max-height 0.3s ease;
+}
+
+/* Custom Scrollbar */
+.editor-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.editor-body::-webkit-scrollbar-track {
+    background: #1a1b26;
+}
+
+.editor-body::-webkit-scrollbar-thumb {
+    background: #2f3352;
+    border-radius: 5px;
+    border: 2px solid #1a1b26;
+}
+
+.editor-body::-webkit-scrollbar-thumb:hover {
+    background: #3b3f5c;
+}
+
+/* ---------- Code Area ---------- */
+.code-area {
+    padding: 12px 0;
+    min-height: 100%;
+}
+
+/* ---------- Code Line ---------- */
+.code-line {
+    display: flex;
+    align-items: flex-start;
+    min-height: 24px;
+    line-height: 24px;
+    padding: 0 16px 0 0;
+}
+
+.code-line:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ---------- Line Number ---------- */
+.line-number {
+    display: inline-block;
+    width: 50px;
+    min-width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: #363b54;
+    user-select: none;
+    flex-shrink: 0;
+    line-height: 24px;
+}
+
+.code-line:hover .line-number {
+    color: #565f89;
+}
+
+/* ---------- Line Content ---------- */
+.line-content {
+    flex: 1;
+    font-family: var(--font-code);
+    font-size: 13.5px;
+    color: #a9b1d6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 24px;
+    min-height: 24px;
+}
+
+/* ---------- Cursor ---------- */
+.cursor {
+    color: #c0caf5;
+    font-weight: 400;
+    animation: none;
+}
+
+.cursor.blink {
+    animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ---------- Status Bar ---------- */
+.editor-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 24px;
+    padding: 0 12px;
+    background: #16161e;
+    border-top: 1px solid #101014;
+    font-size: 11px;
+    color: var(--text-muted);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.status-left,
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.status-item {
+    white-space: nowrap;
+}
+
+/* ---- Highlight.js Overrides for Editor ---- */
+.line-content .hljs-keyword {
+    color: #bb9af7;
+}
+
+.line-content .hljs-string {
+    color: #9ece6a;
+}
+
+.line-content .hljs-number {
+    color: #ff9e64;
+}
+
+.line-content .hljs-comment {
+    color: #565f89;
+    font-style: italic;
+}
+
+.line-content .hljs-function {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-title {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-built_in {
+    color: #e0af68;
+}
+
+.line-content .hljs-literal {
+    color: #ff9e64;
+}
+
+.line-content .hljs-type {
+    color: #2ac3de;
+}
+
+.line-content .hljs-params {
+    color: #e0af68;
+}
+
+.line-content .hljs-meta {
+    color: #89ddff;
+}
+
+.line-content .hljs-attr {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-attribute {
+    color: #bb9af7;
+}
+
+.line-content .hljs-selector-tag {
+    color: #f7768e;
+}
+
+.line-content .hljs-selector-class {
+    color: #9ece6a;
+}
+
+.line-content .hljs-selector-id {
+    color: #7aa2f7;
+}
+
+.line-content .hljs-variable {
+    color: #c0caf5;
+}
+
+.line-content .hljs-template-variable {
+    color: #7dcfff;
+}
+
+.line-content .hljs-tag {
+    color: #f7768e;
+}
+
+.line-content .hljs-name {
+    color: #f7768e;
+}
+
+.line-content .hljs-operator {
+    color: #89ddff;
+}
+
+.line-content .hljs-property {
+    color: #73daca;
+}
+
+.line-content .hljs-punctuation {
+    color: #89ddff;
+}
+
+.line-content .hljs-regexp {
+    color: #b4f9f8;
+}
+
+.line-content .hljs-symbol {
+    color: #bb9af7;
+}
+
+.line-content .hljs-subst {
+    color: #c0caf5;
+}
+
+
+/* =============================================
+   RESPONSIVE.CSS — Mobile & Tablet Breakpoints
+   ============================================= */
+
+/* ---------- Tablets (< 1024px) ---------- */
+@media screen and (max-width: 1024px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .input-panel {
+    width: 100%;
+    min-width: unset;
+    max-height: none;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px 16px;
+  }
+  
+  .output-panel {
+    min-height: auto;
+    padding: 20px;
+  }
+  
+  .editor-window {
+    max-width: 100%;
+  }
+  
+  .editor-body {
+    max-height: 50vh;
+  }
+}
+
+/* ---------- Mobile (< 640px) ---------- */
+@media screen and (max-width: 640px) {
+  .input-panel {
+    padding: 16px 12px;
+    gap: 14px;
+  }
+  
+  .settings-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    min-width: unset;
+    padding: 12px 16px;
+  }
+  
+  .output-panel {
+    padding: 12px;
+  }
+  
+  .editor-window {
+    border-radius: var(--radius);
+  }
+  
+  .editor-titlebar {
+    height: 34px;
+    padding: 0 10px;
+  }
+  
+  .editor-tabs {
+    height: 32px;
+  }
+  
+  .tab {
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  
+  .line-number {
+    width: 36px;
+    min-width: 36px;
+    padding-right: 10px;
+    font-size: 11px;
+  }
+  
+  .line-content {
+    font-size: 12px;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+  }
+  
+  .input-group textarea {
+    min-height: 150px;
+    font-size: 12px;
+  }
+  
+  /* Fullscreen adjustments */
+  .app-container.fullscreen .editor-body {
+    height: calc(100vh - 78px) !important;
+  }
+  
+  .app-container.fullscreen .line-content {
+    font-size: 12px;
+  }
+  
+  .app-container.fullscreen .line-number {
+    width: 32px;
+    min-width: 32px;
+    font-size: 10px;
+    padding-right: 8px;
+  }
+}
+
+/* ---------- Very small screens (< 380px) ---------- */
+@media screen and (max-width: 380px) {
+  .line-number {
+    width: 28px;
+    min-width: 28px;
+    padding-right: 6px;
+    font-size: 10px;
+  }
+  
+  .line-content {
+    font-size: 11px;
+  }
+  
+  .editor-titlebar {
+    height: 30px;
+  }
+  
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .window-actions {
+    display: none;
+  }
+}
+
+/* ---------- Landscape Mobile ---------- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .app-container:not(.fullscreen) {
+    flex-direction: row;
+  }
+  
+  .app-container:not(.fullscreen) .input-panel {
+    width: 320px;
+    min-width: 280px;
+    max-height: 100vh;
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+    overflow-y: auto;
+  }
+  
+  .editor-body {
+    max-height: 60vh;
+  }
+}
+
+
+/* =============================================
+   HIGHLIGHT-PARSER.JS
+   Takes raw code + language → produces tokenized
+   lines with balanced HTML tags for progressive
+   character-by-character reveal.
+   ============================================= */
+
+const HighlightParser = (function () {
+
+    /**
+     * Highlight entire code with highlight.js, then parse
+     * the resulting HTML into structured tokens per line.
+     *
+     * @param {string} rawCode - The original code string
+     * @param {string} language - Language identifier (e.g., 'javascript')
+     * @returns {object} { lines: [], totalChars: number }
+     *   Each line = { tokens: [], charCount: number }
+     *   Each token = { type: 'text'|'open'|'close', value: string, char?: string }
+     */
+    function parse(rawCode, language) {
+        // Step 1: Highlight the code
+        let highlightedHTML;
+        try {
+            const result = hljs.highlight(rawCode, { language: language });
+            highlightedHTML = result.value;
+        } catch (e) {
+            // Fallback: just escape HTML
+            highlightedHTML = escapeHtml(rawCode);
+        }
+
+        // Step 2: Tokenize the HTML string
+        const tokens = tokenizeHTML(highlightedHTML);
+
+        // Step 3: Split tokens into lines, balancing open/close tags
+        const lines = splitIntoLines(tokens);
+
+        // Step 4: Count total visible characters
+        let totalChars = 0;
+        lines.forEach(line => {
+            totalChars += line.charCount;
+        });
+        // Add newline chars (one per line break, except last)
+        totalChars += Math.max(0, lines.length - 1);
+
+        return { lines, totalChars };
+    }
+
+    /**
+     * Tokenize an HTML string into a flat array of tokens:
+     *  - { type: 'open', value: '<span class="hljs-keyword">' }
+     *  - { type: 'close', value: '</span>' }
+     *  - { type: 'text', char: 'a' }  (one per visible character)
+     *  - { type: 'newline' }
+     */
+    function tokenizeHTML(html) {
+        const tokens = [];
+        let i = 0;
+
+        while (i < html.length) {
+            if (html[i] === '<') {
+                // Find closing >
+                const closeIdx = html.indexOf('>', i);
+                if (closeIdx === -1) {
+                    // Malformed, treat rest as text
+                    pushTextChars(tokens, html.substring(i));
+                    break;
+                }
+                const tag = html.substring(i, closeIdx + 1);
+                if (tag.startsWith('</')) {
+                    tokens.push({ type: 'close', value: tag });
+                } else {
+                    tokens.push({ type: 'open', value: tag });
+                }
+                i = closeIdx + 1;
+            } else if (html[i] === '&') {
+                // HTML entity (e.g., &amp; &lt; &gt; &quot;)
+                const semiIdx = html.indexOf(';', i);
+                if (semiIdx !== -1 && semiIdx - i < 10) {
+                    const entity = html.substring(i, semiIdx + 1);
+                    const decoded = decodeEntity(entity);
+                    if (decoded === '\n') {
+                        tokens.push({ type: 'newline' });
+                    } else {
+                        tokens.push({ type: 'text', char: decoded, raw: entity });
+                    }
+                    i = semiIdx + 1;
+                } else {
+                    tokens.push({ type: 'text', char: '&', raw: '&' });
+                    i++;
+                }
+            } else if (html[i] === '\n') {
+                tokens.push({ type: 'newline' });
+                i++;
+            } else {
+                tokens.push({ type: 'text', char: html[i], raw: html[i] });
+                i++;
+            }
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Push individual text characters as tokens
+     */
+    function pushTextChars(tokens, text) {
+        for (let c of text) {
+            if (c === '\n') {
+                tokens.push({ type: 'newline' });
+            } else {
+                tokens.push({ type: 'text', char: c, raw: escapeChar(c) });
+            }
+        }
+    }
+
+    /**
+     * Split flat token array into lines, ensuring each line
+     * has balanced tags (re-open unclosed spans on new lines).
+     */
+    function splitIntoLines(tokens) {
+        const lines = [];
+        let currentLineTokens = [];
+        let currentCharCount = 0;
+        let openTagStack = []; // Stack of currently open tags
+
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i];
+
+            if (token.type === 'newline') {
+                // Close all open tags for this line
+                const closeTags = [];
+                for (let j = openTagStack.length - 1; j >= 0; j--) {
+                    closeTags.push({ type: 'close', value: '</span>' });
+                }
+                const lineTokensComplete = [...currentLineTokens, ...closeTags];
+
+                lines.push({
+                    tokens: lineTokensComplete,
+                    charCount: currentCharCount
+                });
+
+                // Start new line — re-open all tags from stack
+                currentLineTokens = [];
+                currentCharCount = 0;
+                for (let j = 0; j < openTagStack.length; j++) {
+                    currentLineTokens.push({ type: 'open', value: openTagStack[j] });
+                }
+
+            } else if (token.type === 'open') {
+                openTagStack.push(token.value);
+                currentLineTokens.push(token);
+
+            } else if (token.type === 'close') {
+                openTagStack.pop();
+                currentLineTokens.push(token);
+
+            } else if (token.type === 'text') {
+                currentLineTokens.push(token);
+                currentCharCount++;
+            }
+        }
+
+        // Don't forget last line
+        if (currentLineTokens.length > 0 || lines.length === 0) {
+            // Close remaining open tags
+            const closeTags = [];
+            for (let j = openTagStack.length - 1; j >= 0; j--) {
+                closeTags.push({ type: 'close', value: '</span>' });
+            }
+            lines.push({
+                tokens: [...currentLineTokens, ...closeTags],
+                charCount: currentCharCount
+            });
+        }
+
+        return lines;
+    }
+
+    /**
+     * Build HTML string showing only the first N visible characters
+     * of a line's tokens.
+     */
+    function buildPartialLine(lineTokens, visibleCount) {
+        let html = '';
+        let charsRevealed = 0;
+        let openTags = 0;
+
+        for (let i = 0; i < lineTokens.length; i++) {
+            const token = lineTokens[i];
+
+            if (token.type === 'open') {
+                if (charsRevealed < visibleCount) {
+                    html += token.value;
+                    openTags++;
+                }
+            } else if (token.type === 'close') {
+                if (openTags > 0 && charsRevealed <= visibleCount) {
+                    html += token.value;
+                    openTags--;
+                }
+            } else if (token.type === 'text') {
+                if (charsRevealed < visibleCount) {
+                    html += token.raw || escapeChar(token.char);
+                    charsRevealed++;
+                }
+            }
+        }
+
+        // Close any remaining open tags
+        for (let j = 0; j < openTags; j++) {
+            html += '</span>';
+        }
+
+        return html;
+    }
+
+    /**
+     * Build complete line HTML (all characters visible)
+     */
+    function buildFullLine(lineTokens) {
+        let html = '';
+        for (const token of lineTokens) {
+            if (token.type === 'text') {
+                html += token.raw || escapeChar(token.char);
+            } else {
+                html += token.value;
+            }
+        }
+        return html;
+    }
+
+    // --- Utilities ---
+
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function escapeChar(c) {
+        switch (c) {
+            case '&': return '&amp;';
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '"': return '&quot;';
+            default: return c;
+        }
+    }
+
+    function decodeEntity(entity) {
+        const map = {
+            '&amp;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#39;': "'",
+            '&apos;': "'",
+            '&#x27;': "'",
+            '&nbsp;': ' '
+        };
+        return map[entity] || entity;
+    }
+
+    // --- Public API ---
+    return {
+        parse,
+        buildPartialLine,
+        buildFullLine
+    };
+
+})();
+
+
+/* =============================================
+   EDITOR-UI.JS
+   Manages the visual editor DOM: lines, cursor,
+   scrolling, height growth, fullscreen, etc.
+   ============================================= */
+
+const EditorUI = (function () {
+
+    // DOM references
+    let editorBody = null;
+    let codeArea = null;
+    let statusPosition = null;
+    let statusLanguage = null;
+    let tabName = null;
+    let tabIcon = null;
+    let editorWindow = null;
+
+    // State
+    let currentLineCount = 0;
+    let initialMaxHeight = '50vh';
+    let growthStep = 24; // px per line
+
+    // File icons by extension
+    const fileIcons = {
+        'js': '📜', 'ts': '💠', 'py': '🐍', 'java': '☕',
+        'cpp': '⚙️', 'c': '⚙️', 'cs': '🟪', 'html': '🌐',
+        'css': '🎨', 'php': '🐘', 'rb': '💎', 'go': '🔷',
+        'rs': '🦀', 'swift': '🧡', 'kt': '🟣', 'dart': '🎯',
+        'sql': '🗄️', 'sh': '🖥️', 'json': '📋', 'xml': '📰',
+        'yml': '📄', 'yaml': '📄', 'md': '📝'
+    };
+
+    // Language display names
+    const languageNames = {
+        'javascript': 'JavaScript', 'python': 'Python', 'java': 'Java',
+        'cpp': 'C++', 'c': 'C', 'csharp': 'C#', 'typescript': 'TypeScript',
+        'html': 'HTML', 'css': 'CSS', 'php': 'PHP', 'ruby': 'Ruby',
+        'go': 'Go', 'rust': 'Rust', 'swift': 'Swift', 'kotlin': 'Kotlin',
+        'dart': 'Dart', 'sql': 'SQL', 'bash': 'Bash', 'json': 'JSON',
+        'xml': 'XML', 'yaml': 'YAML', 'markdown': 'Markdown'
+    };
+
+    /**
+     * Initialize - cache DOM elements
+     */
+    function init() {
+        editorBody = document.getElementById('editorBody');
+        codeArea = document.getElementById('codeArea');
+        statusPosition = document.getElementById('statusPosition');
+        statusLanguage = document.getElementById('statusLanguage');
+        tabName = document.getElementById('tabName');
+        tabIcon = document.getElementById('tabIcon');
+        editorWindow = document.getElementById('editorWindow');
+    }
+
+    /**
+     * Reset editor to blank state with cursor on line 1
+     */
+    function reset() {
+        codeArea.innerHTML = '';
+        currentLineCount = 0;
+        addLine(1);
+        updateCursor(1, 1);
+        updateEditorHeight();
+        editorBody.scrollTop = 0;
+    }
+
+    /**
+     * Add a new line to the editor
+     */
+    function addLine(lineNumber) {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'code-line';
+        lineDiv.setAttribute('data-line', lineNumber);
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'line-number';
+        numSpan.textContent = lineNumber;
+
+        const contentSpan = document.createElement('span');
+        contentSpan.className = 'line-content';
+
+        lineDiv.appendChild(numSpan);
+        lineDiv.appendChild(contentSpan);
+        codeArea.appendChild(lineDiv);
+
+        currentLineCount = lineNumber;
+        return contentSpan;
+    }
+
+    /**
+     * Get the line-content element for a given line number
+     */
+    function getLineContent(lineNumber) {
+        const lineDivs = codeArea.querySelectorAll('.code-line');
+        if (lineNumber <= lineDivs.length) {
+            return lineDivs[lineNumber - 1].querySelector('.line-content');
+        }
+        return null;
+    }
+
+    /**
+     * Set HTML content of a specific line (with cursor appended)
+     */
+    function setLineHTML(lineNumber, html, showCursor) {
+        let contentEl = getLineContent(lineNumber);
+        if (!contentEl) {
+            contentEl = addLine(lineNumber);
+        }
+        if (showCursor) {
+            contentEl.innerHTML = html + '<span class="cursor blink">█</span>';
+        } else {
+            contentEl.innerHTML = html;
+        }
+    }
+
+    /**
+     * Remove cursor from all lines
+     */
+    function clearAllCursors() {
+        const cursors = codeArea.querySelectorAll('.cursor');
+        cursors.forEach(c => c.remove());
+    }
+
+    /**
+     * Add blinking cursor to a specific line
+     */
+    function addCursorToLine(lineNumber) {
+        clearAllCursors();
+        const contentEl = getLineContent(lineNumber);
+        if (contentEl) {
+            const cursorSpan = document.createElement('span');
+            cursorSpan.className = 'cursor blink';
+            cursorSpan.textContent = '█';
+            contentEl.appendChild(cursorSpan);
+        }
+    }
+
+    /**
+     * Temporarily stop cursor blinking (during fast typing)
+     */
+    function setCursorSolid() {
+        const cursor = codeArea.querySelector('.cursor');
+        if (cursor) {
+            cursor.classList.remove('blink');
+        }
+    }
+
+    /**
+     * Resume cursor blinking
+     */
+    function setCursorBlink() {
+        const cursor = codeArea.querySelector('.cursor');
+        if (cursor) {
+            cursor.classList.add('blink');
+        }
+    }
+
+    /**
+     * Update status bar position
+     */
+    function updateCursor(line, col) {
+        if (statusPosition) {
+            statusPosition.textContent = `Ln ${line}, Col ${col}`;
+        }
+    }
+
+    /**
+     * Set the language in status bar
+     */
+    function setLanguage(langId) {
+        if (statusLanguage) {
+            statusLanguage.textContent = languageNames[langId] || langId;
+        }
+    }
+
+    /**
+     * Set the file tab name and icon
+     */
+    function setFileName(name) {
+        if (tabName) tabName.textContent = name;
+        if (tabIcon) {
+            const ext = name.split('.').pop().toLowerCase();
+            tabIcon.textContent = fileIcons[ext] || '📄';
+        }
+    }
+
+    /**
+     * Auto-scroll editor body to keep cursor visible
+     */
+    function scrollToBottom() {
+        if (editorBody) {
+            editorBody.scrollTop = editorBody.scrollHeight;
+        }
+    }
+
+    /**
+     * Smart scroll - only scroll if cursor is near bottom
+     */
+    function scrollIfNeeded() {
+        if (!editorBody) return;
+        const threshold = 60;
+        const distFromBottom = editorBody.scrollHeight - editorBody.scrollTop - editorBody.clientHeight;
+        if (distFromBottom < threshold) {
+            editorBody.scrollTop = editorBody.scrollHeight;
+        }
+    }
+
+    /**
+     * Dynamically grow editor height based on content
+     * Starts at 50vh, grows up to 90vh, then scrolls
+     */
+    function updateEditorHeight() {
+        if (!editorBody) return;
+
+        const appContainer = document.getElementById('appContainer');
+        if (appContainer && appContainer.classList.contains('fullscreen')) {
+            return; // Don't adjust in fullscreen
+        }
+
+        const contentHeight = codeArea.scrollHeight + 20;
+        const minHeight = window.innerHeight * 0.35;
+        const maxHeight = window.innerHeight * 0.85;
+
+        const targetHeight = Math.max(minHeight, Math.min(contentHeight, maxHeight));
+        editorBody.style.maxHeight = targetHeight + 'px';
+    }
+
+    /**
+     * Enter fullscreen mode
+     */
+    function enterFullscreen() {
+        const container = document.getElementById('appContainer');
+        container.classList.add('fullscreen');
+
+        const exitBtn = document.getElementById('btnExitFullscreen');
+        exitBtn.style.display = 'block';
+
+        // Auto-hide exit button after 3 seconds
+        clearTimeout(EditorUI._exitBtnTimeout);
+        EditorUI._exitBtnTimeout = setTimeout(() => {
+            exitBtn.style.opacity = '0.2';
+        }, 3000);
+
+        exitBtn.addEventListener('mouseenter', () => {
+            exitBtn.style.opacity = '1';
+        });
+        exitBtn.addEventListener('mouseleave', () => {
+            exitBtn.style.opacity = '0.2';
+        });
+    }
+
+    /**
+     * Exit fullscreen mode
+     */
+    function exitFullscreen() {
+        const container = document.getElementById('appContainer');
+        container.classList.remove('fullscreen');
+
+        const exitBtn = document.getElementById('btnExitFullscreen');
+        exitBtn.style.display = 'none';
+
+        updateEditorHeight();
+    }
+
+    /**
+     * Check if in fullscreen
+     */
+    function isFullscreen() {
+        const container = document.getElementById('appContainer');
+        return container.classList.contains('fullscreen');
+    }
+
+    // --- Public API ---
+    return {
+        init,
+        reset,
+        addLine,
+        getLineContent,
+        setLineHTML,
+        clearAllCursors,
+        addCursorToLine,
+        setCursorSolid,
+        setCursorBlink,
+        updateCursor,
+        setLanguage,
+        setFileName,
+        scrollToBottom,
+        scrollIfNeeded,
+        updateEditorHeight,
+        enterFullscreen,
+        exitFullscreen,
+        isFullscreen,
+        _exitBtnTimeout: null
+    };
+
+})();
+
+
+
+/* =============================================
+   TYPING-ENGINE.JS
+   The core animation loop — reveals code
+   character by character with humanized timing.
+   ============================================= */
+
+const TypingEngine = (function() {
+  
+  // State
+  let parsedData = null; // { lines: [], totalChars }
+  let currentLine = 0; // 0-indexed
+  let currentChar = 0; // chars revealed on current line
+  let totalRevealed = 0; // total chars + newlines revealed
+  let isRunning = false;
+  let isPaused = false;
+  let animationTimer = null;
+  
+  // Settings
+  let speed = 40; // chars per second
+  let newlineDelay = 300; // ms extra pause at newlines
+  let humanize = true; // random delay variation
+  let soundEnabled = false;
+  
+  // Callbacks
+  let onTick = null; // called each char: (line, col, totalRevealed, totalChars)
+  let onLineComplete = null; // called when a line is done: (lineIndex)
+  let onComplete = null; // called when all done
+  let onStart = null; // called on start
+  
+  // Audio
+  let audioCtx = null;
+  
+  /**
+   * Configure the engine
+   */
+  function configure(options) {
+    if (options.speed !== undefined) speed = options.speed;
+    if (options.newlineDelay !== undefined) newlineDelay = options.newlineDelay;
+    if (options.humanize !== undefined) humanize = options.humanize;
+    if (options.soundEnabled !== undefined) soundEnabled = options.soundEnabled;
+    if (options.onTick) onTick = options.onTick;
+    if (options.onLineComplete) onLineComplete = options.onLineComplete;
+    if (options.onComplete) onComplete = options.onComplete;
+    if (options.onStart) onStart = options.onStart;
+  }
+  
+  /**
+   * Load parsed data and reset state
+   */
+  function load(data) {
+    parsedData = data;
+    currentLine = 0;
+    currentChar = 0;
+    totalRevealed = 0;
+    isRunning = false;
+    isPaused = false;
+  }
+  
+  /**
+   * Start or resume the animation
+   */
+  function play() {
+    if (!parsedData || parsedData.lines.length === 0) return;
+    
+    if (isPaused) {
+      isPaused = false;
+      isRunning = true;
+      scheduleNext();
+      return;
+    }
+    
+    if (isRunning) return;
+    
+    isRunning = true;
+    isPaused = false;
+    
+    if (onStart) onStart();
+    
+    scheduleNext();
+  }
+  
+  /**
+   * Pause the animation
+   */
+  function pause() {
+    if (!isRunning) return;
+    isPaused = true;
+    isRunning = false;
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
+  }
+  
+  /**
+   * Stop and reset
+   */
+  function stop() {
+    isRunning = false;
+    isPaused = false;
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
+    currentLine = 0;
+    currentChar = 0;
+    totalRevealed = 0;
+  }
+  
+  /**
+   * Check states
+   */
+  function getState() {
+    return {
+      isRunning,
+      isPaused,
+      currentLine,
+      currentChar,
+      totalRevealed,
+      totalChars: parsedData ? parsedData.totalChars : 0
+    };
+  }
+  
+  /**
+   * Schedule the next character reveal
+   */
+  function scheduleNext() {
+    if (!isRunning || isPaused) return;
+    
+    const delay = calculateDelay();
+    
+    animationTimer = setTimeout(() => {
+      revealNext();
+    }, delay);
+  }
+  
+  /**
+   * Calculate delay for next character
+   */
+  function calculateDelay() {
+    let baseDelay = 1000 / speed;
+    
+    if (humanize) {
+      // Add random variation: ±40%
+      const variation = baseDelay * 0.4;
+      baseDelay += (Math.random() * variation * 2) - variation;
+      
+      // Occasional micro-pause (simulates thinking)
+      if (Math.random() < 0.03) {
+        baseDelay += 150 + Math.random() * 200;
+      }
+    }
+    
+    return Math.max(5, baseDelay);
+  }
+  
+  /**
+   * Reveal the next character
+   */
+  function revealNext() {
+    if (!isRunning || isPaused || !parsedData) return;
+    
+    const lines = parsedData.lines;
+    
+    // Safety check
+    if (currentLine >= lines.length) {
+      finish();
+      return;
+    }
+    
+    const line = lines[currentLine];
+    
+    if (currentChar < line.charCount) {
+      // Reveal next char on current line
+      currentChar++;
+      totalRevealed++;
+      
+      // Play sound
+      if (soundEnabled) playKeySound();
+      
+      // Callback
+      if (onTick) {
+        onTick(currentLine, currentChar, totalRevealed, parsedData.totalChars);
+      }
+      
+      scheduleNext();
+      
+    } else {
+      // Line complete
+      if (onLineComplete) {
+        onLineComplete(currentLine);
+      }
+      
+      // Move to next line
+      currentLine++;
+      currentChar = 0;
+      totalRevealed++; // count the newline
+      
+      if (currentLine >= lines.length) {
+        finish();
+        return;
+      }
+      
+      // Add newline delay
+      if (newlineDelay > 0) {
+        let nlDelay = newlineDelay;
+        if (humanize) {
+          nlDelay += (Math.random() * newlineDelay * 0.5) - (newlineDelay * 0.25);
+        }
+        
+        animationTimer = setTimeout(() => {
+          // Callback for the new line start (0 chars)
+          if (onTick) {
+            onTick(currentLine, 0, totalRevealed, parsedData.totalChars);
+          }
+          scheduleNext();
+        }, Math.max(0, nlDelay));
+      } else {
+        if (onTick) {
+          onTick(currentLine, 0, totalRevealed, parsedData.totalChars);
+        }
+        scheduleNext();
+      }
+    }
+  }
+  
+  /**
+   * Animation complete
+   */
+  function finish() {
+    isRunning = false;
+    isPaused = false;
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
+    if (onComplete) onComplete();
+  }
+  
+  /**
+   * Play a tiny keyboard click sound using Web Audio API
+   */
+  function playKeySound() {
+    try {
+      if (!audioCtx) {
+        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      // Randomize slightly for realism
+      const baseFreq = 800 + Math.random() * 600;
+      oscillator.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+      oscillator.type = 'square';
+      
+      gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.05);
+    } catch (e) {
+      // Silently fail — audio not critical
+    }
+  }
+  
+  // --- Public API ---
+  return {
+    configure,
+    load,
+    play,
+    pause,
+    stop,
+    getState
+  };
+  
+})();
+
+
+
+/* =============================================
+   APP.JS — Main Controller
+   Wires everything together: UI events,
+   parser, engine, and editor.
+   ============================================= */
+
+(function () {
+    'use strict';
+
+    // ---- DOM Elements ----
+    const codeInput = document.getElementById('codeInput');
+    const languageSelect = document.getElementById('languageSelect');
+    const fileNameInput = document.getElementById('fileNameInput');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValue = document.getElementById('speedValue');
+    const newlineDelaySlider = document.getElementById('newlineDelay');
+    const newlineDelayValue = document.getElementById('newlineDelayValue');
+    const humanizeToggle = document.getElementById('humanizeToggle');
+    const soundToggle = document.getElementById('soundToggle');
+    const btnPlay = document.getElementById('btnPlay');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const btnReset = document.getElementById('btnReset');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const btnExitFullscreen = document.getElementById('btnExitFullscreen');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    // ---- State ----
+    let parsedData = null;
+    let isAnimating = false;
+
+    // ---- Initialize ----
+    function init() {
+        EditorUI.init();
+        EditorUI.reset();
+
+        bindEvents();
+        updateUIFromInputs();
+    }
+
+    // ---- Event Bindings ----
+    function bindEvents() {
+        // Speed slider
+        speedSlider.addEventListener('input', () => {
+            speedValue.textContent = speedSlider.value;
+            TypingEngine.configure({ speed: parseInt(speedSlider.value) });
+        });
+
+        // Newline delay slider
+        newlineDelaySlider.addEventListener('input', () => {
+            newlineDelayValue.textContent = newlineDelaySlider.value;
+            TypingEngine.configure({ newlineDelay: parseInt(newlineDelaySlider.value) });
+        });
+
+        // Humanize toggle
+        humanizeToggle.addEventListener('change', () => {
+            TypingEngine.configure({ humanize: humanizeToggle.checked });
+        });
+
+        // Sound toggle
+        soundToggle.addEventListener('change', () => {
+            TypingEngine.configure({ soundEnabled: soundToggle.checked });
+        });
+
+        // File name change → update tab
+        fileNameInput.addEventListener('input', () => {
+            EditorUI.setFileName(fileNameInput.value || 'untitled');
+        });
+
+        // Language change → update status bar & auto-set filename
+        languageSelect.addEventListener('change', () => {
+            EditorUI.setLanguage(languageSelect.value);
+            autoSetFileName();
+        });
+
+        // Play button
+        btnPlay.addEventListener('click', handlePlay);
+
+        // Reset button
+        btnReset.addEventListener('click', handleReset);
+
+        // Fullscreen button
+        btnFullscreen.addEventListener('click', () => {
+            if (EditorUI.isFullscreen()) {
+                EditorUI.exitFullscreen();
+            } else {
+                EditorUI.enterFullscreen();
+            }
+        });
+
+        // Exit fullscreen button
+        btnExitFullscreen.addEventListener('click', () => {
+            EditorUI.exitFullscreen();
+        });
+
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && EditorUI.isFullscreen()) {
+                EditorUI.exitFullscreen();
+            }
+        });
+
+        // Tab key support in textarea
+        codeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = codeInput.selectionStart;
+                const end = codeInput.selectionEnd;
+                codeInput.value = codeInput.value.substring(0, start) + '    ' + codeInput.value.substring(end);
+                codeInput.selectionStart = codeInput.selectionEnd = start + 4;
+            }
+        });
+
+        // Window resize → recalculate editor height
+        window.addEventListener('resize', () => {
+            EditorUI.updateEditorHeight();
+        });
+    }
+
+    // ---- Handlers ----
+
+    function handlePlay() {
+        const state = TypingEngine.getState();
+
+        if (state.isRunning) {
+            // Pause
+            TypingEngine.pause();
+            setPlayButton('resume');
+            EditorUI.setCursorBlink();
+            return;
+        }
+
+        if (state.isPaused) {
+            // Resume
+            TypingEngine.play();
+            setPlayButton('pause');
+            EditorUI.setCursorSolid();
+            return;
+        }
+
+        // Fresh start
+        startAnimation();
+    }
+
+    function handleReset() {
+        TypingEngine.stop();
+        EditorUI.reset();
+        setPlayButton('play');
+        progressContainer.classList.remove('active');
+        isAnimating = false;
+    }
+
+    function startAnimation() {
+        const code = codeInput.value;
+        if (!code.trim()) {
+            shakeButton(btnPlay);
+            return;
+        }
+
+        const language = languageSelect.value;
+        const fileName = fileNameInput.value || 'untitled';
+
+        // Parse code
+        parsedData = HighlightParser.parse(code, language);
+
+        if (!parsedData || parsedData.lines.length === 0) return;
+
+        // Setup editor
+        EditorUI.reset();
+        EditorUI.setLanguage(language);
+        EditorUI.setFileName(fileName);
+
+        // Show progress
+        progressContainer.classList.add('active');
+        updateProgress(0, parsedData.totalChars);
+
+        // Configure engine
+        TypingEngine.configure({
+            speed: parseInt(speedSlider.value),
+            newlineDelay: parseInt(newlineDelaySlider.value),
+            humanize: humanizeToggle.checked,
+            soundEnabled: soundToggle.checked,
+
+            onStart: () => {
+                isAnimating = true;
+                setPlayButton('pause');
+                EditorUI.setCursorSolid();
+            },
+
+            onTick: (lineIndex, charCount, totalRevealed, totalChars) => {
+                renderTick(lineIndex, charCount);
+                updateProgress(totalRevealed, totalChars);
+                EditorUI.updateCursor(lineIndex + 1, charCount + 1);
+                EditorUI.scrollIfNeeded();
+                EditorUI.updateEditorHeight();
+            },
+
+            onLineComplete: (lineIndex) => {
+                // Finalize this line (remove cursor, show full content)
+                const line = parsedData.lines[lineIndex];
+                const fullHTML = HighlightParser.buildFullLine(line.tokens);
+                EditorUI.setLineHTML(lineIndex + 1, fullHTML, false);
+            },
+
+            onComplete: () => {
+                isAnimating = false;
+                setPlayButton('play');
+                EditorUI.setCursorBlink();
+                updateProgress(parsedData.totalChars, parsedData.totalChars);
+
+                // Add cursor to the last line
+                const lastLine = parsedData.lines.length;
+                EditorUI.addCursorToLine(lastLine);
+
+                // Ensure last line shows fully
+                const lastLineData = parsedData.lines[lastLine - 1];
+                const fullHTML = HighlightParser.buildFullLine(lastLineData.tokens);
+                EditorUI.setLineHTML(lastLine, fullHTML, true);
+            }
+        });
+
+        // Load & play
+        TypingEngine.load(parsedData);
+
+        // Render initial state (line 1, 0 chars — just cursor)
+        renderTick(0, 0);
+
+        TypingEngine.play();
+    }
+
+    /**
+     * Render a single tick: update the current line's content
+     */
+    function renderTick(lineIndex, charCount) {
+        const lineNum = lineIndex + 1;
+        const line = parsedData.lines[lineIndex];
+
+        // Ensure the line element exists
+        const existingContent = EditorUI.getLineContent(lineNum);
+        if (!existingContent) {
+            EditorUI.addLine(lineNum);
+        }
+
+        // Build partial HTML
+        const partialHTML = HighlightParser.buildPartialLine(line.tokens, charCount);
+
+        // Set it with cursor
+        EditorUI.setLineHTML(lineNum, partialHTML, true);
+    }
+
+    // ---- UI Helpers ----
+
+    function setPlayButton(state) {
+        switch (state) {
+            case 'play':
+                playIcon.textContent = '▶';
+                playText.textContent = 'Play';
+                btnPlay.classList.remove('paused');
+                break;
+            case 'pause':
+                playIcon.textContent = '⏸';
+                playText.textContent = 'Pause';
+                btnPlay.classList.remove('paused');
+                break;
+            case 'resume':
+                playIcon.textContent = '▶';
+                playText.textContent = 'Resume';
+                btnPlay.classList.add('paused');
+                break;
+        }
+    }
+
+    function updateProgress(current, total) {
+        if (total === 0) return;
+        const pct = Math.round((current / total) * 100);
+        progressBar.style.width = pct + '%';
+        progressText.textContent = pct + '%';
+    }
+
+    function shakeButton(btn) {
+        btn.style.animation = 'shake 0.4s ease';
+        setTimeout(() => {
+            btn.style.animation = '';
+        }, 400);
+    }
+
+    function updateUIFromInputs() {
+        speedValue.textContent = speedSlider.value;
+        newlineDelayValue.textContent = newlineDelaySlider.value;
+        EditorUI.setFileName(fileNameInput.value || 'index.js');
+        EditorUI.setLanguage(languageSelect.value);
+    }
+
+    function autoSetFileName() {
+        const lang = languageSelect.value;
+        const extMap = {
+            'javascript': 'index.js', 'python': 'main.py', 'java': 'Main.java',
+            'cpp': 'main.cpp', 'c': 'main.c', 'csharp': 'Program.cs',
+            'typescript': 'index.ts', 'html': 'index.html', 'css': 'style.css',
+            'php': 'index.php', 'ruby': 'main.rb', 'go': 'main.go',
+            'rust': 'main.rs', 'swift': 'main.swift', 'kotlin': 'Main.kt',
+            'dart': 'main.dart', 'sql': 'query.sql', 'bash': 'script.sh',
+            'json': 'data.json', 'xml': 'data.xml', 'yaml': 'config.yml',
+            'markdown': 'README.md'
+        };
+        const newName = extMap[lang] || 'untitled';
+        fileNameInput.value = newName;
+        EditorUI.setFileName(newName);
+    }
+
+    // ---- Shake animation (injected dynamically) ----
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-4px); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ---- Boot ----
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();
