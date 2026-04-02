@@ -137,12 +137,15 @@ const Recorder = (function () {
       tabPadX:    r(Math.max(12, 16 * s)),
       tabFont:    r(Math.max(12, 14 * s)),
       tabAccent:  Math.max(2, r(2.5 * s)),
-      // Code
-      fontSize:   r(Math.max(13, 16 * s)),
-      lineH:      r(Math.max(22, 28 * s)),
-      lineNumPadR:r(Math.max(14, 20 * s)),
-      codePadTop: r(Math.max(8, 12 * s)),
+      
+      // --- CODE ZOOM UPDATES HERE ---
+      fontSize:   r(Math.max(18, 24 * s)), // Increased for zoom
+      lineH:      r(Math.max(32, 42 * s)), // Increased for zoom
+      lineNumPadR:r(Math.max(20, 30 * s)), // Increased to accommodate larger numbers
+      codePadTop: r(Math.max(12, 20 * s)), // Increased for better spacing
       codePadR:   r(Math.max(8, 12 * s)),
+      // ------------------------------
+
       // Scrollbar
       sbW:        r(Math.max(8, 12 * s)),
       sbPad:      r(Math.max(2, 3 * s)),
