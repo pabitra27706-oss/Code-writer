@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeType Studio</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/editor.css">
     <link rel="stylesheet" href="css/responsive.css">
@@ -19,9 +16,8 @@
 <body>
     <div class="app-container" id="appContainer">
 
-        <!-- ========== INPUT PANEL ========== -->
+        <!-- ===== INPUT PANEL ===== -->
         <div class="input-panel" id="inputPanel">
-
             <div class="logo">
                 <span class="logo-icon">⌨️</span>
                 <span class="logo-text">CodeType <span class="logo-highlight">Studio</span></span>
@@ -81,32 +77,22 @@ console.log(result);</textarea>
             </div>
 
             <div class="input-group">
-                <label for="speedSlider">
-                    Typing Speed: <span id="speedValue">40</span> chars/sec
-                </label>
+                <label for="speedSlider">Typing Speed: <span id="speedValue">40</span> chars/sec</label>
                 <input type="range" id="speedSlider" min="5" max="200" value="40" step="1">
-                <div class="speed-labels">
-                    <span>🐢 Slow</span>
-                    <span>🐇 Fast</span>
-                </div>
+                <div class="speed-labels"><span>🐢 Slow</span><span>🐇 Fast</span></div>
             </div>
 
             <div class="input-group">
-                <label for="newlineDelay">
-                    Newline Pause: <span id="newlineDelayValue">300</span> ms
-                </label>
+                <label for="newlineDelay">Newline Pause: <span id="newlineDelayValue">300</span> ms</label>
                 <input type="range" id="newlineDelay" min="0" max="1000" value="300" step="50">
-                <div class="speed-labels">
-                    <span>None</span>
-                    <span>Long</span>
-                </div>
+                <div class="speed-labels"><span>None</span><span>Long</span></div>
             </div>
 
             <div class="input-group toggle-group">
                 <label class="toggle-label">
                     <input type="checkbox" id="humanizeToggle" checked>
                     <span class="toggle-switch"></span>
-                    <span>Humanized Typing (random delays)</span>
+                    <span>Humanized Typing</span>
                 </label>
             </div>
 
@@ -118,58 +104,51 @@ console.log(result);</textarea>
                 </label>
             </div>
 
-            <!-- ===== RECORDING SETTINGS ===== -->
-            <div class="section-divider">
-                <span>Recording</span>
-            </div>
+            <!-- Recording Settings -->
+            <div class="section-divider"><span>Recording</span></div>
 
             <div class="settings-row">
                 <div class="input-group half">
                     <label for="resolutionSelect">Resolution</label>
                     <select id="resolutionSelect">
-                        <option value="1280x720" selected>720p (1280×720)</option>
-                        <option value="1920x1080">1080p (1920×1080)</option>
-                        <option value="854x480">480p (854×480)</option>
+                        <option value="1080x1920" selected>1080×1920 (Vertical)</option>
+                        <option value="720x1280">720×1280 (Vertical)</option>
+                        <option value="1920x1080">1920×1080 (Landscape)</option>
+                        <option value="1280x720">1280×720 (Landscape)</option>
                     </select>
                 </div>
                 <div class="input-group half">
-                    <label for="endBufferSlider">
-                        End Buffer: <span id="endBufferValue">2</span>s
-                    </label>
+                    <label for="endBufferSlider">End Buffer: <span id="endBufferValue">2</span>s</label>
                     <input type="range" id="endBufferSlider" min="0" max="5" value="2" step="0.5">
                 </div>
             </div>
 
-            <!-- Control Buttons -->
+            <!-- Buttons -->
             <div class="control-buttons">
                 <button class="btn btn-play" id="btnPlay">
                     <span class="btn-icon" id="playIcon">▶</span>
                     <span id="playText">Play</span>
                 </button>
                 <button class="btn btn-record" id="btnRecord">
-                    <span class="btn-icon">⏺</span>
+                    <span class="btn-icon" id="recordIcon">⏺</span>
                     <span id="recordText">Record</span>
                 </button>
                 <button class="btn btn-reset" id="btnReset">
                     <span class="btn-icon">⟲</span>
                     <span>Reset</span>
                 </button>
-                <button class="btn btn-fullscreen" id="btnFullscreen">
-                    <span class="btn-icon">⛶</span>
-                    <span>Fullscreen</span>
-                </button>
             </div>
 
-            <!-- Progress -->
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
                 <span class="progress-text" id="progressText">0%</span>
             </div>
         </div>
 
-        <!-- ========== OUTPUT PANEL ========== -->
+        <!-- ===== OUTPUT PANEL ===== -->
         <div class="output-panel" id="outputPanel">
 
+            <!-- DOM Editor (Play mode) -->
             <div class="editor-window" id="editorWindow">
                 <div class="editor-titlebar">
                     <div class="window-dots">
@@ -184,7 +163,6 @@ console.log(result);</textarea>
                         <span class="win-btn">×</span>
                     </div>
                 </div>
-
                 <div class="editor-tabs">
                     <div class="tab active" id="editorTab">
                         <span class="tab-icon" id="tabIcon">📄</span>
@@ -192,7 +170,6 @@ console.log(result);</textarea>
                         <span class="tab-close">×</span>
                     </div>
                 </div>
-
                 <div class="editor-body" id="editorBody">
                     <div class="code-area" id="codeArea">
                         <div class="code-line" data-line="1">
@@ -201,7 +178,6 @@ console.log(result);</textarea>
                         </div>
                     </div>
                 </div>
-
                 <div class="editor-statusbar">
                     <div class="status-left">
                         <span class="status-item" id="statusLanguage">JavaScript</span>
@@ -214,9 +190,8 @@ console.log(result);</textarea>
                 </div>
             </div>
 
-            <button class="btn-exit-fullscreen" id="btnExitFullscreen">
-                ✕ Exit Fullscreen (ESC)
-            </button>
+            <!-- Canvas Preview (Record mode) -->
+            <div class="canvas-preview" id="canvasPreview"></div>
 
             <!-- Recording Indicator -->
             <div class="recording-indicator" id="recordingIndicator">
@@ -227,15 +202,15 @@ console.log(result);</textarea>
         </div>
     </div>
 
-    <!-- ===== DOWNLOAD OVERLAY ===== -->
+    <!-- Download Overlay -->
     <div class="download-overlay" id="downloadOverlay">
         <div class="download-card">
             <div class="download-header">
                 <span class="download-icon">🎬</span>
                 <h2>Recording Complete!</h2>
             </div>
-            <div class="download-preview" id="downloadPreview">
-                <video id="previewVideo" controls></video>
+            <div class="download-preview">
+                <video id="previewVideo" controls playsinline></video>
             </div>
             <div class="download-info">
                 <span id="downloadSize">—</span>

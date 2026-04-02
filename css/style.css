@@ -472,7 +472,7 @@ body {
     border-radius: 0;
 }
 /* =============================================
-   RECORDING STYLES
+   RECORDING & CANVAS PREVIEW STYLES
    ============================================= */
 
 /* ---------- Section Divider ---------- */
@@ -486,7 +486,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
 .section-divider::before,
 .section-divider::after {
     content: '';
@@ -498,24 +497,42 @@ body {
 /* ---------- Record Button ---------- */
 .btn-record {
     background: var(--bg-tertiary);
-    border-color: var(--border-color);
 }
-
 .btn-record:hover {
     background: #2d1a1a;
     border-color: var(--accent-red);
+    color: var(--accent-red);
 }
-
 .btn-record.recording {
     background: var(--accent-red);
     border-color: var(--accent-red);
     color: #fff;
     animation: recordPulse 1.5s ease-in-out infinite;
 }
-
 @keyframes recordPulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
+    50% { opacity: 0.75; }
+}
+
+/* ---------- Canvas Preview ---------- */
+.canvas-preview {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    align-items: center;
+    justify-content: center;
+}
+.canvas-preview.active {
+    display: flex;
+}
+.canvas-preview canvas {
+    width: 100%;
+    height: auto;
+    max-height: 85vh;
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* ---------- Recording Indicator ---------- */
@@ -540,11 +557,9 @@ body {
     gap: 10px;
     user-select: none;
 }
-
 .recording-indicator.active {
     display: flex;
 }
-
 .rec-dot {
     width: 10px;
     height: 10px;
@@ -552,17 +567,14 @@ body {
     background: var(--accent-red);
     animation: recBlink 1s ease-in-out infinite;
 }
-
 @keyframes recBlink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    50% { opacity: 0.2; }
 }
-
 .rec-label {
     color: var(--accent-red);
     letter-spacing: 1px;
 }
-
 .rec-timer {
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
@@ -582,74 +594,63 @@ body {
     align-items: center;
     justify-content: center;
 }
-
 .download-overlay.active {
     display: flex;
 }
-
 .download-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 32px;
-    max-width: 560px;
-    width: 90%;
+    padding: 28px;
+    max-width: 520px;
+    width: 92%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
-
 .download-header {
     display: flex;
     align-items: center;
     gap: 12px;
 }
-
 .download-header h2 {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0;
 }
-
-.download-icon {
-    font-size: 32px;
-}
-
+.download-icon { font-size: 28px; }
 .download-preview {
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--border-color);
     background: #000;
 }
-
 .download-preview video {
     width: 100%;
     display: block;
-    max-height: 300px;
+    max-height: 340px;
+    object-fit: contain;
 }
-
 .download-info {
     display: flex;
-    gap: 20px;
+    gap: 12px;
     justify-content: center;
-    font-size: 13px;
+    flex-wrap: wrap;
+    font-size: 12px;
     color: var(--text-secondary);
 }
-
 .download-info span {
-    padding: 4px 12px;
+    padding: 4px 10px;
     background: var(--bg-tertiary);
     border-radius: 6px;
     border: 1px solid var(--border-color);
 }
-
 .download-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
-
 .btn-download {
     flex: 2;
     background: var(--accent-green) !important;
@@ -657,19 +658,37 @@ body {
     color: #000 !important;
     font-weight: 700 !important;
 }
-
 .btn-download:hover {
     background: #36a346 !important;
     border-color: #36a346 !important;
 }
-
 .btn-close-overlay {
     flex: 1;
-    background: var(--bg-tertiary) !important;
 }
-
-/* ---------- Disabled state for buttons ---------- */
 .btn:disabled {
     cursor: not-allowed;
-    opacity: 0.4;
+    opacity: 0.4 !important;
+}
+
+/* ---------- Mobile responsive for canvas ---------- */
+@media screen and (max-width: 1024px) {
+    .canvas-preview {
+        max-width: 100%;
+        padding: 12px;
+    }
+    .canvas-preview canvas {
+        max-height: 70vh;
+    }
+}
+@media screen and (max-width: 640px) {
+    .canvas-preview canvas {
+        border-radius: var(--radius);
+        max-height: 65vh;
+    }
+    .download-card {
+        padding: 20px;
+    }
+    .download-preview video {
+        max-height: 260px;
+    }
 }

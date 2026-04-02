@@ -1,60 +1,63 @@
 /* =============================================
    RECORDER.JS
-   Records the typing animation to a canvas
-   and exports as WebM/MP4 video file.
+   Renders a pixel-perfect VS Code editor on
+   canvas (vertical) and records as video.
+   Looks identical to a real screen recording.
    ============================================= */
 
 const Recorder = (function () {
 
-  // ---- Tokyo Night Color Scheme ----
+  // ---- Tokyo Night Dark — Exact VS Code Colors ----
   const C = {
-    bg:         '#1a1b26',
-    titleBar:   '#16161e',
-    titleBorder:'#101014',
-    tabBg:      '#16161e',
-    tabActive:  '#1a1b26',
-    tabAccent:  '#58a6ff',
-    statusBg:   '#16161e',
-    statusBorder:'#101014',
-    lineNum:    '#363b54',
-    lineNumHover:'#565f89',
-    text:       '#a9b1d6',
-    cursor:     '#c0caf5',
-    dotRed:     '#f85149',
-    dotYellow:  '#d29922',
-    dotGreen:   '#3fb950',
-    muted:      '#484f58',
-    codeBg:     '#1a1b26',
-    // Syntax
-    keyword:    '#bb9af7',
-    string:     '#9ece6a',
-    number:     '#ff9e64',
-    comment:    '#565f89',
-    func:       '#7aa2f7',
-    title:      '#7aa2f7',
-    built_in:   '#e0af68',
-    literal:    '#ff9e64',
-    type:       '#2ac3de',
-    params:     '#e0af68',
-    meta:       '#89ddff',
-    attr:       '#7aa2f7',
-    attribute:  '#bb9af7',
-    selectorTag:'#f7768e',
-    selectorClass:'#9ece6a',
-    selectorId: '#7aa2f7',
-    variable:   '#c0caf5',
-    templateVar:'#7dcfff',
-    tag:        '#f7768e',
-    name:       '#f7768e',
-    operator:   '#89ddff',
-    property:   '#73daca',
-    punctuation:'#89ddff',
-    regexp:     '#b4f9f8',
-    symbol:     '#bb9af7',
-    subst:      '#c0caf5',
+    editorBg:      '#1a1b26',
+    titleBar:      '#16161e',
+    titleBorder:   '#101014',
+    tabBg:         '#16161e',
+    tabActive:     '#1a1b26',
+    tabAccent:     '#58a6ff',
+    statusBg:      '#16161e',
+    statusBorder:  '#101014',
+    lineNum:       '#363b54',
+    lineNumActive: '#c0caf5',
+    text:          '#a9b1d6',
+    cursor:        '#c0caf5',
+    currentLine:   'rgba(255, 255, 255, 0.04)',
+    dotRed:        '#f85149',
+    dotYellow:     '#d29922',
+    dotGreen:      '#3fb950',
+    muted:         '#484f58',
+    white:         '#e6edf3',
+    scrollTrack:   'rgba(255, 255, 255, 0.02)',
+    scrollThumb:   'rgba(255, 255, 255, 0.10)',
+    // Syntax highlighting
+    keyword:       '#bb9af7',
+    string:        '#9ece6a',
+    number:        '#ff9e64',
+    comment:       '#565f89',
+    func:          '#7aa2f7',
+    title:         '#7aa2f7',
+    built_in:      '#e0af68',
+    literal:       '#ff9e64',
+    type:          '#2ac3de',
+    params:        '#e0af68',
+    meta:          '#89ddff',
+    attr:          '#7aa2f7',
+    attribute:     '#bb9af7',
+    selectorTag:   '#f7768e',
+    selectorClass: '#9ece6a',
+    selectorId:    '#7aa2f7',
+    variable:      '#c0caf5',
+    templateVar:   '#7dcfff',
+    tag:           '#f7768e',
+    name:          '#f7768e',
+    operator:      '#89ddff',
+    property:      '#73daca',
+    punctuation:   '#89ddff',
+    regexp:        '#b4f9f8',
+    symbol:        '#bb9af7',
+    subst:         '#c0caf5',
   };
 
-  // Maps hljs class suffix → color
   const syntaxColorMap = {
     'keyword': C.keyword, 'string': C.string, 'number': C.number,
     'comment': C.comment, 'function': C.func, 'title': C.title,
@@ -68,7 +71,7 @@ const Recorder = (function () {
     'regexp': C.regexp, 'symbol': C.symbol, 'subst': C.subst,
   };
 
-  // ---- State ----
+  // ---- Internal State ----
   let canvas = null;
   let ctx = null;
   let mediaRecorder = null;
@@ -77,114 +80,111 @@ const Recorder = (function () {
   let recording = false;
   let typingDone = false;
   let lastFrameTime = 0;
+  let smoothScroll = 0;
 
-  // Config
   let config = {
-    width: 1280,
-    height: 720,
-    fps: 30,
-    bitrate: 4000000,
+    width: 1080, height: 1920, fps: 30, bitrate: 6000000,
     fontFamily: 'JetBrains Mono, Consolas, monospace',
-    uiFont: 'Inter, sans-serif',
+    uiFont: 'Inter, -apple-system, sans-serif',
   };
 
-  // Layout (computed on init)
   let L = {};
   let charW = 0;
   let maxCharsPerRow = 0;
   let visibleRows = 0;
 
-  // Animation state
   let state = {
     parsedData: null,
-    currentLine: 0,
-    currentChar: 0,
-    totalRevealed: 0,
-    totalChars: 0,
-    fileName: 'index.js',
-    language: 'JavaScript',
-    scrollOffset: 0, // first visible logical line
+    currentLine: 0,  currentChar: 0,
+    totalRevealed: 0, totalChars: 0,
+    fileName: 'index.js', language: 'JavaScript',
+    scrollOffset: 0,
   };
 
-  // ======================================
-  //  INITIALIZATION
-  // ======================================
+  // ============================================================
+  //  INIT + LAYOUT
+  // ============================================================
 
   function init(opts) {
     if (opts) {
-      if (opts.width) config.width = opts.width;
-      if (opts.height) config.height = opts.height;
-      if (opts.fps) config.fps = opts.fps;
+      if (opts.width)   config.width  = opts.width;
+      if (opts.height)  config.height = opts.height;
+      if (opts.fps)     config.fps    = opts.fps;
       if (opts.bitrate) config.bitrate = opts.bitrate;
     }
-
-    // Create offscreen canvas
     canvas = document.createElement('canvas');
-    canvas.width = config.width;
+    canvas.width  = config.width;
     canvas.height = config.height;
     ctx = canvas.getContext('2d');
-
     computeLayout();
-    measureCharWidth();
+    measureChar();
   }
 
   function computeLayout() {
-    const W = config.width;
-    const H = config.height;
-    const s = H / 720; // scale factor relative to 720p
+    const W = config.width, H = config.height;
+    const s = H / 1920;
 
     L = {
+      W, H, s,
       // Title bar
-      titleBarH: Math.round(38 * s),
-      titleBarPadX: Math.round(14 * s),
-      dotR: Math.round(6 * s),
-      dotGap: Math.round(8 * s),
-      dotOffsetY: 0, // computed below
-      titleFontSize: Math.round(12 * s),
-
+      titleH:     r(Math.max(34, 44 * s)),
+      titlePadX:  r(16 * s),
+      dotR:       r(Math.max(4.5, 6.5 * s)),
+      dotGap:     r(Math.max(6, 8 * s)),
+      titleFont:  r(Math.max(11, 13 * s)),
       // Tab bar
-      tabBarH: Math.round(36 * s),
-      tabPadX: Math.round(16 * s),
-      tabFontSize: Math.round(13 * s),
-      tabAccentH: Math.round(2 * s),
-
-      // Code area
-      codeFontSize: Math.round(13.5 * s),
-      lineHeight: Math.round(24 * s),
-      lineNumW: Math.round(50 * s),
-      lineNumPadR: Math.round(16 * s),
-      codePadTop: Math.round(12 * s),
-      codePadRight: Math.round(16 * s),
-
+      tabH:       r(Math.max(32, 40 * s)),
+      tabPadX:    r(Math.max(12, 16 * s)),
+      tabFont:    r(Math.max(12, 14 * s)),
+      tabAccent:  Math.max(2, r(2.5 * s)),
+      // Code
+      fontSize:   r(Math.max(13, 16 * s)),
+      lineH:      r(Math.max(22, 28 * s)),
+      lineNumPadR:r(Math.max(14, 20 * s)),
+      codePadTop: r(Math.max(8, 12 * s)),
+      codePadR:   r(Math.max(8, 12 * s)),
+      // Scrollbar
+      sbW:        r(Math.max(8, 12 * s)),
+      sbPad:      r(Math.max(2, 3 * s)),
+      sbMinThumb: r(Math.max(24, 36 * s)),
       // Status bar
-      statusBarH: Math.round(24 * s),
-      statusFontSize: Math.round(11 * s),
-      statusPadX: Math.round(12 * s),
-
-      // Computed
-      codeAreaY: 0,
-      codeAreaH: 0,
-      codeContentX: 0,
-      codeContentW: 0,
+      statusH:    r(Math.max(24, 28 * s)),
+      statusFont: r(Math.max(10, 12 * s)),
+      statusPadX: r(Math.max(12, 16 * s)),
+      // Will be computed
+      lineNumW: 0, codeAreaY: 0, codeAreaH: 0,
+      codeX: 0, codeW: 0, statusY: 0,
     };
 
-    L.dotOffsetY = L.titleBarH / 2;
-    L.codeAreaY = L.titleBarH + L.tabBarH;
-    L.codeAreaH = H - L.titleBarH - L.tabBarH - L.statusBarH;
-    L.codeContentX = L.lineNumW;
-    L.codeContentW = W - L.lineNumW - L.codePadRight;
+    L.codeAreaY = L.titleH + L.tabH;
+    L.codeAreaH = H - L.codeAreaY - L.statusH;
+    L.statusY   = H - L.statusH;
   }
 
-  function measureCharWidth() {
-    ctx.font = `${L.codeFontSize}px ${config.fontFamily}`;
-    charW = ctx.measureText('M').width;
-    maxCharsPerRow = Math.floor(L.codeContentW / charW);
-    visibleRows = Math.floor((L.codeAreaH - L.codePadTop * 2) / L.lineHeight);
+  function measureChar() {
+    ctx.font = `${L.fontSize}px ${config.fontFamily}`;
+    const sample = 'MMMMMMMMMM';
+    charW = ctx.measureText(sample).width / sample.length;
+    if (charW <= 0) charW = L.fontSize * 0.6;
+    recalcCodeMetrics();
   }
 
-  // ======================================
+  function recalcCodeMetrics() {
+    // Dynamic line number width based on total lines
+    const digits = state.parsedData
+      ? Math.max(2, String(state.parsedData.lines.length).length) : 2;
+    L.lineNumW = r(digits * charW + L.lineNumPadR + 12 * L.s);
+    L.codeX = L.lineNumW;
+    L.codeW = L.W - L.lineNumW - L.codePadR;
+    maxCharsPerRow = Math.max(1, Math.floor(L.codeW / charW));
+    visibleRows = Math.max(1, Math.floor((L.codeAreaH - L.codePadTop * 2) / L.lineH));
+  }
+
+  function r(v) { return Math.round(v); }
+
+  // ============================================================
   //  STATE MANAGEMENT
-  // ======================================
+  // ============================================================
 
   function setParsedData(data) {
     state.parsedData = data;
@@ -193,495 +193,451 @@ const Recorder = (function () {
     state.currentChar = 0;
     state.totalRevealed = 0;
     state.scrollOffset = 0;
+    smoothScroll = 0;
     typingDone = false;
+    recalcCodeMetrics();
   }
 
-  function setMeta(fileName, language) {
-    state.fileName = fileName || 'untitled';
-    state.language = language || '';
+  function setMeta(fn, lang) {
+    state.fileName = fn || 'untitled';
+    state.language = lang || '';
   }
 
-  function updateState(lineIndex, charCount, totalRevealed, totalChars) {
-    state.currentLine = lineIndex;
+  function updateState(lineIdx, charCount, revealed, total) {
+    state.currentLine = lineIdx;
     state.currentChar = charCount;
-    state.totalRevealed = totalRevealed;
-    state.totalChars = totalChars;
-    calculateScroll();
+    state.totalRevealed = revealed;
+    state.totalChars = total;
+    calcScroll();
   }
 
-  function setComplete(done) {
-    typingDone = done;
-  }
+  function setComplete(v) { typingDone = v; }
 
-  function calculateScroll() {
+  function calcScroll() {
     if (!state.parsedData) return;
-
-    // Count visual rows up to current line
-    let totalVisualRows = 0;
-    for (let i = 0; i <= state.currentLine && i < state.parsedData.lines.length; i++) {
-      const lc = state.parsedData.lines[i].charCount;
-      totalVisualRows += Math.max(1, Math.ceil(lc / maxCharsPerRow));
+    let rows = 0;
+    const lines = state.parsedData.lines;
+    for (let i = 0; i <= state.currentLine && i < lines.length; i++) {
+      if (i < state.currentLine) {
+        rows += Math.max(1, Math.ceil(Math.max(1, lines[i].charCount) / maxCharsPerRow));
+      } else {
+        rows += Math.floor(state.currentChar / maxCharsPerRow) + 1;
+      }
     }
-
-    // If cursor row exceeds visible area, scroll
-    const maxVisible = visibleRows - 2; // keep 2 rows margin
-    if (totalVisualRows > maxVisible + state.scrollOffset) {
-      state.scrollOffset = totalVisualRows - maxVisible;
-    }
+    const margin = Math.max(3, Math.floor(visibleRows * 0.15));
+    const needed = rows - (visibleRows - margin);
+    if (needed > state.scrollOffset) state.scrollOffset = needed;
+    if (state.scrollOffset < 0) state.scrollOffset = 0;
   }
 
-  // ======================================
+  // ============================================================
   //  RECORDING CONTROL
-  // ======================================
+  // ============================================================
 
   function startRecording() {
     return new Promise((resolve, reject) => {
-      if (!canvas) {
-        reject(new Error('Recorder not initialized'));
-        return;
-      }
-
-      // Recalculate after fonts may have loaded
-      measureCharWidth();
-
+      if (!canvas) { reject(new Error('Not initialized')); return; }
+      measureChar();
       chunks = [];
       recording = true;
       typingDone = false;
+      smoothScroll = 0;
 
-      // Get canvas stream
       let stream;
-      try {
-        stream = canvas.captureStream(config.fps);
-      } catch (e) {
-        reject(new Error('captureStream not supported'));
-        return;
-      }
+      try { stream = canvas.captureStream(config.fps); }
+      catch (e) { reject(new Error('captureStream unsupported')); return; }
 
-      // Determine MIME type
-      const mimeType = getSupportedMimeType();
-      if (!mimeType) {
-        reject(new Error('No supported video codec found'));
-        return;
-      }
+      const mime = getBestMime();
+      if (!mime) { reject(new Error('No supported video codec')); return; }
 
       try {
         mediaRecorder = new MediaRecorder(stream, {
-          mimeType: mimeType,
+          mimeType: mime,
           videoBitsPerSecond: config.bitrate,
         });
-      } catch (e) {
-        reject(new Error('MediaRecorder creation failed: ' + e.message));
-        return;
-      }
+      } catch (e) { reject(new Error('MediaRecorder failed')); return; }
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          chunks.push(e.data);
-        }
+      mediaRecorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
       };
-
-      mediaRecorder.onerror = (e) => {
-        console.error('MediaRecorder error:', e);
-      };
-
-      mediaRecorder.start(100); // collect data every 100ms
-
-      // Start render loop
+      mediaRecorder.start(100);
       lastFrameTime = performance.now();
-      renderLoop(performance.now());
-
+      tick(performance.now());
       resolve();
     });
   }
 
   function stopRecording() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       recording = false;
-
-      // Stop render loop
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
       if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        const blob = chunks.length > 0
-          ? new Blob(chunks, { type: chunks[0].type || 'video/webm' })
-          : null;
-        resolve(blob);
+        resolve(chunks.length ? new Blob(chunks, { type: 'video/webm' }) : null);
         return;
       }
-
       mediaRecorder.onstop = () => {
-        const mimeType = mediaRecorder.mimeType || 'video/webm';
-        const blob = new Blob(chunks, { type: mimeType });
+        const blob = new Blob(chunks, { type: mediaRecorder.mimeType || 'video/webm' });
         mediaRecorder = null;
         resolve(blob);
       };
-
       mediaRecorder.stop();
     });
   }
 
-  function isRecording() {
-    return recording;
+  function isRecording() { return recording; }
+
+  // ============================================================
+  //  RENDER LOOP
+  // ============================================================
+
+  function tick(ts) {
+    if (!recording) return;
+    const interval = 1000 / config.fps;
+    if (ts - lastFrameTime >= interval) {
+      lastFrameTime = ts - ((ts - lastFrameTime) % interval);
+      render();
+    }
+    rafId = requestAnimationFrame(tick);
   }
 
-  // ======================================
-  //  RENDER LOOP
-  // ======================================
-
-  function renderLoop(timestamp) {
-    if (!recording) return;
-
-    const elapsed = timestamp - lastFrameTime;
-    const frameInterval = 1000 / config.fps;
-
-    if (elapsed >= frameInterval) {
-      lastFrameTime = timestamp - (elapsed % frameInterval);
-      renderFrame();
+  function render() {
+    // Smooth scroll interpolation
+    smoothScroll += (state.scrollOffset - smoothScroll) * 0.18;
+    if (Math.abs(smoothScroll - state.scrollOffset) < 0.05) {
+      smoothScroll = state.scrollOffset;
     }
 
-    rafId = requestAnimationFrame(renderLoop);
+    ctx.fillStyle = C.editorBg;
+    ctx.fillRect(0, 0, L.W, L.H);
+
+    drawTitleBar();
+    drawTabBar();
+    drawCode();
+    drawScrollbar();
+    drawStatusBar();
   }
 
-  function renderFrame() {
-    const W = config.width;
-    const H = config.height;
+  // ============================================================
+  //  DRAW — TITLE BAR
+  // ============================================================
 
-    // Clear
-    ctx.fillStyle = C.bg;
-    ctx.fillRect(0, 0, W, H);
+  function drawTitleBar() {
+    const h = L.titleH;
 
-    drawTitleBar(W);
-    drawTabBar(W);
-    drawCodeArea(W, H);
-    drawStatusBar(W, H);
-  }
-
-  // ======================================
-  //  DRAWING FUNCTIONS
-  // ======================================
-
-  function drawTitleBar(W) {
-    const h = L.titleBarH;
-
-    // Background
     ctx.fillStyle = C.titleBar;
-    ctx.fillRect(0, 0, W, h);
-
-    // Bottom border
+    ctx.fillRect(0, 0, L.W, h);
     ctx.fillStyle = C.titleBorder;
-    ctx.fillRect(0, h - 1, W, 1);
+    ctx.fillRect(0, h - 1, L.W, 1);
 
-    // Traffic light dots
-    const dotY = h / 2;
-    const startX = L.titleBarPadX + L.dotR;
-
-    [C.dotRed, C.dotYellow, C.dotGreen].forEach((color, i) => {
+    // Traffic lights
+    const cy = h / 2;
+    const sx = L.titlePadX + L.dotR;
+    const colors = [C.dotRed, C.dotYellow, C.dotGreen];
+    for (let i = 0; i < 3; i++) {
       ctx.beginPath();
-      ctx.arc(startX + i * (L.dotR * 2 + L.dotGap), dotY, L.dotR, 0, Math.PI * 2);
-      ctx.fillStyle = color;
+      ctx.arc(sx + i * (L.dotR * 2 + L.dotGap), cy, L.dotR, 0, Math.PI * 2);
+      ctx.fillStyle = colors[i];
       ctx.fill();
-    });
+    }
 
-    // Title text
-    ctx.font = `500 ${L.titleFontSize}px ${config.uiFont}`;
+    // Centered title
+    ctx.font = `500 ${L.titleFont}px ${config.uiFont}`;
     ctx.fillStyle = C.muted;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('CodeType Studio', W / 2, dotY);
-
-    // Window actions (decorative)
-    ctx.textAlign = 'right';
-    ctx.fillStyle = C.muted;
-    ctx.globalAlpha = 0.5;
-    ctx.fillText('─   □   ×', W - L.titleBarPadX, dotY);
-    ctx.globalAlpha = 1;
-
+    ctx.fillText(state.fileName + ' — CodeType Studio', L.W / 2, cy);
     ctx.textAlign = 'left';
   }
 
-  function drawTabBar(W) {
-    const y = L.titleBarH;
-    const h = L.tabBarH;
+  // ============================================================
+  //  DRAW — TAB BAR
+  // ============================================================
 
-    // Background
+  function drawTabBar() {
+    const y = L.titleH, h = L.tabH;
+
     ctx.fillStyle = C.tabBg;
-    ctx.fillRect(0, y, W, h);
-
-    // Bottom border
+    ctx.fillRect(0, y, L.W, h);
     ctx.fillStyle = C.titleBorder;
-    ctx.fillRect(0, y + h - 1, W, 1);
+    ctx.fillRect(0, y + h - 1, L.W, 1);
+
+    // Measure tab width
+    ctx.font = `${L.tabFont}px ${config.uiFont}`;
+    const tw = ctx.measureText(state.fileName).width;
+    const tabW = Math.min(L.W * 0.55, tw + L.tabPadX * 2 + 30 * L.s);
 
     // Active tab
-    const tabW = Math.min(200, Math.max(120, state.fileName.length * 10 + 60));
-
-    // Tab background
     ctx.fillStyle = C.tabActive;
     ctx.fillRect(0, y, tabW, h);
 
-    // Tab accent line
+    // Accent
     ctx.fillStyle = C.tabAccent;
-    ctx.fillRect(0, y + h - L.tabAccentH, tabW, L.tabAccentH);
+    ctx.fillRect(0, y + h - L.tabAccent - 1, tabW, L.tabAccent);
 
-    // Tab right border
+    // Right border
     ctx.fillStyle = C.titleBorder;
     ctx.fillRect(tabW, y, 1, h);
 
-    // Tab text
-    ctx.font = `${L.tabFontSize}px ${config.uiFont}`;
-    ctx.fillStyle = C.text;
+    // Filename
+    ctx.font = `${L.tabFont}px ${config.uiFont}`;
+    ctx.fillStyle = C.white;
     ctx.textBaseline = 'middle';
-    ctx.fillText(state.fileName, L.tabPadX + 4, y + h / 2);
+    ctx.fillText(state.fileName, L.tabPadX, y + h / 2);
 
-    // Tab close "×"
+    // Close ×
     ctx.fillStyle = C.muted;
     ctx.fillText('×', tabW - L.tabPadX, y + h / 2);
   }
 
-  function drawCodeArea(W, H) {
+  // ============================================================
+  //  DRAW — CODE AREA
+  // ============================================================
+
+  function drawCode() {
     if (!state.parsedData) return;
-
     const lines = state.parsedData.lines;
-    const areaY = L.codeAreaY;
-    const areaH = L.codeAreaH;
 
-    // Background
-    ctx.fillStyle = C.codeBg;
-    ctx.fillRect(0, areaY, W, areaH);
-
-    // Clip to code area
     ctx.save();
     ctx.beginPath();
-    ctx.rect(0, areaY, W, areaH);
+    ctx.rect(0, L.codeAreaY, L.W, L.codeAreaH);
     ctx.clip();
 
-    // Set font
-    ctx.font = `${L.codeFontSize}px ${config.fontFamily}`;
-    ctx.textBaseline = 'middle';
+    let visRow = 0;
 
-    let visualRow = 0;
-    let drawnRows = 0;
+    for (let li = 0; li < lines.length; li++) {
+      const line = lines[li];
+      const rows = Math.max(1, Math.ceil(Math.max(1, line.charCount) / maxCharsPerRow));
 
-    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-      const line = lines[lineIdx];
-      const lineRows = Math.max(1, Math.ceil(Math.max(1, line.charCount) / maxCharsPerRow));
+      // Skip above viewport
+      if (visRow + rows <= smoothScroll - 1) { visRow += rows; continue; }
 
-      // Skip lines above scroll
-      if (visualRow + lineRows <= state.scrollOffset) {
-        visualRow += lineRows;
-        continue;
+      // Below viewport
+      const firstOff = visRow - smoothScroll;
+      if (firstOff >= visibleRows + 2) break;
+
+      // Chars to show
+      let show;
+      if (li < state.currentLine)      show = line.charCount;
+      else if (li === state.currentLine) show = state.currentChar;
+      else break;
+
+      // Current line highlight
+      if (li === state.currentLine) {
+        const curRow = Math.floor(state.currentChar / maxCharsPerRow);
+        const hlOff = firstOff + curRow;
+        if (hlOff >= -1 && hlOff < visibleRows + 1) {
+          const hlY = L.codeAreaY + L.codePadTop + hlOff * L.lineH;
+          ctx.fillStyle = C.currentLine;
+          ctx.fillRect(0, hlY, L.W, L.lineH);
+        }
       }
 
-      // Stop if below visible area
-      if (drawnRows >= visibleRows + 2) break;
-
-      // Determine how many chars to show on this line
-      let charsToShow;
-      if (lineIdx < state.currentLine) {
-        charsToShow = line.charCount; // fully revealed
-      } else if (lineIdx === state.currentLine) {
-        charsToShow = state.currentChar; // partially revealed
-      } else {
-        break; // haven't reached this line yet
-      }
-
-      // Draw line number (on first visual row of this line)
-      const firstRowY = areaY + L.codePadTop +
-        (visualRow - state.scrollOffset) * L.lineHeight;
-
-      if (visualRow >= state.scrollOffset) {
-        ctx.fillStyle = C.lineNum;
+      // Line number
+      if (firstOff >= -1 && firstOff < visibleRows + 1) {
+        const lnY = L.codeAreaY + L.codePadTop + firstOff * L.lineH + L.lineH / 2;
+        ctx.fillStyle = (li === state.currentLine) ? C.lineNumActive : C.lineNum;
         ctx.textAlign = 'right';
-        ctx.font = `${L.codeFontSize}px ${config.fontFamily}`;
-        ctx.fillText(
-          String(lineIdx + 1),
-          L.lineNumW - L.lineNumPadR,
-          firstRowY + L.lineHeight / 2
-        );
+        ctx.font = `${L.fontSize}px ${config.fontFamily}`;
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(li + 1), L.lineNumW - L.lineNumPadR, lnY);
         ctx.textAlign = 'left';
       }
 
-      // Draw tokens for this line
-      drawLineTokens(line.tokens, charsToShow, lineIdx, visualRow);
+      // Tokens
+      renderTokens(line.tokens, show, visRow);
 
-      // Draw cursor on current line
-      if (lineIdx === state.currentLine) {
-        drawCursor(charsToShow, visualRow);
-      }
+      // Cursor
+      if (li === state.currentLine) drawCursor(show, visRow);
 
-      visualRow += lineRows;
-      drawnRows += lineRows;
+      visRow += rows;
     }
 
     ctx.restore();
   }
 
-  function drawLineTokens(tokens, maxChars, lineIdx, startVisualRow) {
-    let charsDrawn = 0;
-    let x = L.lineNumW;
-    let row = 0;
-    const colorStack = [C.text]; // default color
-    const areaY = L.codeAreaY;
+  function renderTokens(tokens, maxChars, startRow) {
+    if (maxChars <= 0) return;
 
-    ctx.font = `${L.codeFontSize}px ${config.fontFamily}`;
+    let drawn = 0, x = L.codeX, row = 0;
+    const stack = [C.text];
+
+    ctx.font = `${L.fontSize}px ${config.fontFamily}`;
     ctx.textBaseline = 'middle';
 
-    for (let i = 0; i < tokens.length && charsDrawn < maxChars; i++) {
-      const token = tokens[i];
+    for (let i = 0; i < tokens.length && drawn < maxChars; i++) {
+      const tk = tokens[i];
 
-      if (token.type === 'open') {
-        const cls = extractHljsClass(token.value);
-        const color = cls ? (syntaxColorMap[cls] || C.text) : C.text;
-        colorStack.push(color);
-      } else if (token.type === 'close') {
-        if (colorStack.length > 1) colorStack.pop();
-      } else if (token.type === 'text') {
-        if (charsDrawn >= maxChars) break;
+      if (tk.type === 'open') {
+        const cls = hljsClass(tk.value);
+        stack.push(cls ? (syntaxColorMap[cls] || C.text) : C.text);
+      } else if (tk.type === 'close') {
+        if (stack.length > 1) stack.pop();
+      } else if (tk.type === 'text') {
+        if (drawn >= maxChars) break;
+        const off = startRow + row - smoothScroll;
 
-        const rowOffset = startVisualRow + row - state.scrollOffset;
-        if (rowOffset >= 0 && rowOffset < visibleRows + 2) {
-          const y = areaY + L.codePadTop + rowOffset * L.lineHeight + L.lineHeight / 2;
-          ctx.fillStyle = colorStack[colorStack.length - 1];
+        if (off >= -1 && off < visibleRows + 2) {
+          const y = L.codeAreaY + L.codePadTop + off * L.lineH + L.lineH / 2;
+          const isComm = stack.includes(C.comment);
 
-          // Check for comment italic
-          const isComment = colorStack.some(c => c === C.comment);
-          if (isComment) {
-            ctx.font = `italic ${L.codeFontSize}px ${config.fontFamily}`;
-          }
-
-          ctx.fillText(token.char, x, y);
-
-          if (isComment) {
-            ctx.font = `${L.codeFontSize}px ${config.fontFamily}`;
-          }
+          if (isComm) ctx.font = `italic ${L.fontSize}px ${config.fontFamily}`;
+          ctx.fillStyle = stack[stack.length - 1];
+          ctx.fillText(tk.char, x, y);
+          if (isComm) ctx.font = `${L.fontSize}px ${config.fontFamily}`;
         }
 
         x += charW;
-        charsDrawn++;
+        drawn++;
 
-        // Wrap
-        if (x + charW > config.width - L.codePadRight) {
-          x = L.lineNumW;
-          row++;
-        }
+        if (x + charW > L.W - L.codePadR) { x = L.codeX; row++; }
       }
     }
   }
 
-  function drawCursor(charsOnLine, startVisualRow) {
-    // Calculate cursor position
-    const row = Math.floor(charsOnLine / maxCharsPerRow);
-    const col = charsOnLine % maxCharsPerRow;
-    const visualRowOffset = startVisualRow + row - state.scrollOffset;
+  function drawCursor(chars, startRow) {
+    const row = Math.floor(chars / maxCharsPerRow);
+    const col = chars % maxCharsPerRow;
+    const off = startRow + row - smoothScroll;
 
-    if (visualRowOffset < 0 || visualRowOffset > visibleRows) return;
+    if (off < -1 || off >= visibleRows + 1) return;
 
-    const x = L.lineNumW + col * charW;
-    const y = L.codeAreaY + L.codePadTop + visualRowOffset * L.lineHeight;
+    const blink = typingDone ? (Math.floor(performance.now() / 530) % 2 === 0) : true;
+    if (!blink) return;
 
-    // Blink effect: use time-based toggle
-    const blinkOn = typingDone
-      ? (Math.floor(performance.now() / 530) % 2 === 0)
-      : true; // solid during typing
+    const x = L.codeX + col * charW;
+    const y = L.codeAreaY + L.codePadTop + off * L.lineH;
+    const cw = Math.max(2, r(2.2 * L.s));
+    const ch = L.lineH - r(4 * L.s);
 
-    if (blinkOn) {
-      ctx.fillStyle = C.cursor;
-      ctx.globalAlpha = 0.9;
-      ctx.fillRect(x, y + 2, charW, L.lineHeight - 4);
-      ctx.globalAlpha = 1;
-    }
+    ctx.fillStyle = C.cursor;
+    ctx.fillRect(x, y + r(2 * L.s), cw, ch);
   }
 
-  function drawStatusBar(W, H) {
-    const y = H - L.statusBarH;
+  // ============================================================
+  //  DRAW — SCROLLBAR
+  // ============================================================
 
-    // Background
+  function drawScrollbar() {
+    if (!state.parsedData) return;
+
+    // Count revealed visual rows
+    let revRows = 0;
+    const lines = state.parsedData.lines;
+    for (let i = 0; i <= state.currentLine && i < lines.length; i++) {
+      revRows += Math.max(1, Math.ceil(Math.max(1, lines[i].charCount) / maxCharsPerRow));
+    }
+
+    if (revRows <= visibleRows) return;
+
+    const tX = L.W - L.sbW;
+    const tY = L.codeAreaY;
+    const tH = L.codeAreaH;
+
+    // Track
+    ctx.fillStyle = C.scrollTrack;
+    ctx.fillRect(tX, tY, L.sbW, tH);
+
+    // Thumb
+    const ratio = visibleRows / revRows;
+    const thumbH = Math.max(L.sbMinThumb, tH * ratio);
+    const maxSc = revRows - visibleRows;
+    const pos = maxSc > 0 ? smoothScroll / maxSc : 0;
+    const thumbY = tY + pos * (tH - thumbH);
+
+    ctx.fillStyle = C.scrollThumb;
+    rrect(tX + L.sbPad, thumbY, L.sbW - L.sbPad * 2, thumbH,
+      (L.sbW - L.sbPad * 2) / 2);
+    ctx.fill();
+  }
+
+  // ============================================================
+  //  DRAW — STATUS BAR
+  // ============================================================
+
+  function drawStatusBar() {
+    const y = L.statusY, h = L.statusH;
+
     ctx.fillStyle = C.statusBg;
-    ctx.fillRect(0, y, W, L.statusBarH);
-
-    // Top border
+    ctx.fillRect(0, y, L.W, h);
     ctx.fillStyle = C.statusBorder;
-    ctx.fillRect(0, y, W, 1);
+    ctx.fillRect(0, y, L.W, 1);
 
-    // Font
-    ctx.font = `${L.statusFontSize}px ${config.uiFont}`;
+    const mid = y + h / 2;
+    ctx.font = `${L.statusFont}px ${config.uiFont}`;
     ctx.textBaseline = 'middle';
-    const midY = y + L.statusBarH / 2;
-
-    // Left: Language, UTF-8
     ctx.fillStyle = C.muted;
-    ctx.textAlign = 'left';
-    ctx.fillText(state.language + '     UTF-8', L.statusPadX, midY);
 
-    // Right: Position, Spaces
+    // Left
+    ctx.textAlign = 'left';
+    ctx.fillText(state.language, L.statusPadX, mid);
+
+    const utf8X = L.statusPadX + ctx.measureText(state.language).width + 20 * L.s;
+    ctx.fillText('UTF-8', utf8X, mid);
+
+    // Right
     ctx.textAlign = 'right';
-    const posText = `Ln ${state.currentLine + 1}, Col ${state.currentChar + 1}     Spaces: 4`;
-    ctx.fillText(posText, W - L.statusPadX, midY);
+    const pos = `Ln ${state.currentLine + 1}, Col ${state.currentChar + 1}`;
+    ctx.fillText(pos, L.W - L.statusPadX, mid);
+
+    const spX = L.W - L.statusPadX - ctx.measureText(pos).width - 24 * L.s;
+    ctx.fillText('Spaces: 4', spX, mid);
 
     ctx.textAlign = 'left';
   }
 
-  // ======================================
+  // ============================================================
   //  HELPERS
-  // ======================================
+  // ============================================================
 
-  function extractHljsClass(openTag) {
-    // Extract class from: <span class="hljs-keyword">
-    const match = openTag.match(/class="([^"]+)"/);
-    if (!match) return null;
-
-    const classes = match[1].split(/\s+/);
-    for (const cls of classes) {
-      if (cls.startsWith('hljs-')) {
-        return cls.substring(5); // remove 'hljs-' prefix
-      }
-    }
-    return classes[0] || null;
+  function rrect(x, y, w, h, rad) {
+    rad = Math.min(rad, w / 2, h / 2);
+    if (rad < 0) rad = 0;
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.lineTo(x + w - rad, y);
+    ctx.arcTo(x + w, y, x + w, y + rad, rad);
+    ctx.lineTo(x + w, y + h - rad);
+    ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
+    ctx.lineTo(x + rad, y + h);
+    ctx.arcTo(x, y + h, x, y + h - rad, rad);
+    ctx.lineTo(x, y + rad);
+    ctx.arcTo(x, y, x + rad, y, rad);
+    ctx.closePath();
   }
 
-  function getSupportedMimeType() {
+  function hljsClass(tag) {
+    const m = tag.match(/class="([^"]+)"/);
+    if (!m) return null;
+    for (const c of m[1].split(/\s+/)) {
+      if (c.startsWith('hljs-')) return c.substring(5);
+    }
+    return null;
+  }
+
+  function getBestMime() {
     const types = [
-      'video/webm;codecs=vp9',
-      'video/webm;codecs=vp8',
-      'video/webm',
-      'video/mp4',
+      'video/webm;codecs=vp9', 'video/webm;codecs=vp8',
+      'video/webm', 'video/mp4',
     ];
-    for (const type of types) {
-      if (MediaRecorder.isTypeSupported(type)) {
-        return type;
-      }
+    for (const t of types) {
+      if (MediaRecorder.isTypeSupported(t)) return t;
     }
     return null;
   }
 
   function isSupported() {
-    return !!(
-      window.MediaRecorder &&
-      HTMLCanvasElement.prototype.captureStream
-    );
+    return !!(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
   }
 
-  function getCanvas() {
-    return canvas;
-  }
+  function getCanvas() { return canvas; }
 
-  // ======================================
+  // ============================================================
   //  PUBLIC API
-  // ======================================
+  // ============================================================
 
   return {
-    init,
-    setParsedData,
-    setMeta,
-    updateState,
-    setComplete,
-    startRecording,
-    stopRecording,
-    isRecording,
-    isSupported,
-    getCanvas,
+    init, setParsedData, setMeta, updateState, setComplete,
+    startRecording, stopRecording, isRecording, isSupported, getCanvas,
   };
 
 })();
