@@ -1,13 +1,108 @@
 /* =============================================
    RECORDER.JS
-   Renders a pixel-perfect VS Code editor on
-   canvas (vertical) and records as video.
-   Looks identical to a real screen recording.
+   Smart browser-aware recorder:
+   - MP4 option when browser supports it
+   - WebM fallback otherwise
+   - 1080p / 2K / 4K quality presets
+   - Canvas-rendered VS Code-style editor
    ============================================= */
 
 const Recorder = (function () {
+  // ---- Browser Capability Detection ----
+  const BrowserSupport = {
+    isSafari: /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
+    isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+    isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
 
-  // ---- Tokyo Night Dark — Exact VS Code Colors ----
+    supportsMP4: false,
+    supportsWebM: false,
+    preferredFormat: 'webm',
+    availableFormats: [],
+
+    init() {
+      const mp4Types = [
+        'video/mp4;codecs=avc1.42E01E',
+        'video/mp4;codecs=h264',
+        'video/mp4'
+      ];
+
+      for (const type of mp4Types) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) {
+          this.supportsMP4 = true;
+          this.availableFormats.push({ type: 'mp4', mime: type });
+          break;
+        }
+      }
+
+      const webmTypes = [
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+
+      for (const type of webmTypes) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) {
+          this.supportsWebM = true;
+          this.availableFormats.push({ type: 'webm', mime: type });
+          break;
+        }
+      }
+
+      if (this.isSafari && this.supportsMP4) {
+        this.preferredFormat = 'mp4';
+      } else if (this.supportsWebM) {
+        this.preferredFormat = 'webm';
+      } else if (this.supportsMP4) {
+        this.preferredFormat = 'mp4';
+      }
+    },
+
+    getMimeType(requestedFormat) {
+      const found = this.availableFormats.find(f => f.type === requestedFormat);
+      return found ? found.mime : (this.availableFormats[0] ? this.availableFormats[0].mime : null);
+    },
+
+    getRecommendedQuality() {
+      if (this.isIOS) return '2k';
+      if (this.isMobile) return '1080p';
+      return '4k';
+    }
+  };
+
+  BrowserSupport.init();
+
+  // ---- Quality Presets ----
+  const QualityPresets = {
+    '1080p': {
+      width: 1080,
+      height: 1920,
+      bitrate: 5000000,
+      label: 'Full HD',
+      fileSize: '~50 MB/min',
+      recommended: 'All devices',
+      warning: ''
+    },
+    '2k': {
+      width: 1440,
+      height: 2560,
+      bitrate: 10000000,
+      label: '2K',
+      fileSize: '~100 MB/min',
+      recommended: 'Desktop & tablets',
+      warning: 'May be slower on older phones.'
+    },
+    '4k': {
+      width: 2160,
+      height: 3840,
+      bitrate: 15000000,
+      label: '4K Ultra HD',
+      fileSize: '~180 MB/min',
+      recommended: 'High-end devices',
+      warning: '4K uses high memory and may lag or fail on mobile devices.'
+    }
+  };
+
+  // ---- Tokyo Night Dark Colors ----
   const C = {
     editorBg:      '#1a1b26',
     titleBar:      '#16161e',
@@ -29,7 +124,6 @@ const Recorder = (function () {
     white:         '#e6edf3',
     scrollTrack:   'rgba(255, 255, 255, 0.02)',
     scrollThumb:   'rgba(255, 255, 255, 0.10)',
-    // Syntax highlighting
     keyword:       '#bb9af7',
     string:        '#9ece6a',
     number:        '#ff9e64',
@@ -83,7 +177,12 @@ const Recorder = (function () {
   let smoothScroll = 0;
 
   let config = {
-    width: 1080, height: 1920, fps: 30, bitrate: 6000000,
+    width: 1080,
+    height: 1920,
+    fps: 30,
+    bitrate: 5000000,
+    format: 'webm',
+    quality: '1080p',
     fontFamily: 'JetBrains Mono, Consolas, monospace',
     uiFont: 'Inter, -apple-system, sans-serif',
   };
@@ -95,27 +194,44 @@ const Recorder = (function () {
 
   let state = {
     parsedData: null,
-    currentLine: 0,  currentChar: 0,
-    totalRevealed: 0, totalChars: 0,
-    fileName: 'index.js', language: 'JavaScript',
+    currentLine: 0,
+    currentChar: 0,
+    totalRevealed: 0,
+    totalChars: 0,
+    fileName: 'index.js',
+    language: 'JavaScript',
     scrollOffset: 0,
   };
 
   // ============================================================
-  //  INIT + LAYOUT
+  // INIT + LAYOUT
   // ============================================================
 
   function init(opts) {
     if (opts) {
-      if (opts.width)   config.width  = opts.width;
-      if (opts.height)  config.height = opts.height;
-      if (opts.fps)     config.fps    = opts.fps;
+      if (opts.quality && QualityPresets[opts.quality]) {
+        const preset = QualityPresets[opts.quality];
+        config.quality = opts.quality;
+        config.width = preset.width;
+        config.height = preset.height;
+        config.bitrate = preset.bitrate;
+      } else {
+        if (opts.width) config.width = opts.width;
+        if (opts.height) config.height = opts.height;
+      }
+
+      if (opts.format) config.format = opts.format;
+      else config.format = BrowserSupport.preferredFormat;
+
+      if (opts.fps) config.fps = opts.fps;
       if (opts.bitrate) config.bitrate = opts.bitrate;
     }
+
     canvas = document.createElement('canvas');
-    canvas.width  = config.width;
+    canvas.width = config.width;
     canvas.height = config.height;
     ctx = canvas.getContext('2d');
+
     computeLayout();
     measureChar();
   }
@@ -126,42 +242,42 @@ const Recorder = (function () {
 
     L = {
       W, H, s,
-      // Title bar
       titleH:     r(Math.max(34, 44 * s)),
       titlePadX:  r(16 * s),
       dotR:       r(Math.max(4.5, 6.5 * s)),
       dotGap:     r(Math.max(6, 8 * s)),
       titleFont:  r(Math.max(11, 13 * s)),
-      // Tab bar
+
       tabH:       r(Math.max(32, 40 * s)),
       tabPadX:    r(Math.max(12, 16 * s)),
       tabFont:    r(Math.max(12, 14 * s)),
       tabAccent:  Math.max(2, r(2.5 * s)),
-      
-      // --- CODE ZOOM UPDATES HERE ---
-      fontSize:   r(Math.max(18, 24 * s)), // Increased for zoom
-      lineH:      r(Math.max(32, 42 * s)), // Increased for zoom
-      lineNumPadR:r(Math.max(20, 30 * s)), // Increased to accommodate larger numbers
-      codePadTop: r(Math.max(12, 20 * s)), // Increased for better spacing
-      codePadR:   r(Math.max(8, 12 * s)),
-      // ------------------------------
 
-      // Scrollbar
+      fontSize:   r(Math.max(18, 24 * s)),
+      lineH:      r(Math.max(32, 42 * s)),
+      lineNumPadR:r(Math.max(20, 30 * s)),
+      codePadTop: r(Math.max(12, 20 * s)),
+      codePadR:   r(Math.max(8, 12 * s)),
+
       sbW:        r(Math.max(8, 12 * s)),
       sbPad:      r(Math.max(2, 3 * s)),
       sbMinThumb: r(Math.max(24, 36 * s)),
-      // Status bar
+
       statusH:    r(Math.max(24, 28 * s)),
       statusFont: r(Math.max(10, 12 * s)),
       statusPadX: r(Math.max(12, 16 * s)),
-      // Will be computed
-      lineNumW: 0, codeAreaY: 0, codeAreaH: 0,
-      codeX: 0, codeW: 0, statusY: 0,
+
+      lineNumW: 0,
+      codeAreaY: 0,
+      codeAreaH: 0,
+      codeX: 0,
+      codeW: 0,
+      statusY: 0,
     };
 
     L.codeAreaY = L.titleH + L.tabH;
     L.codeAreaH = H - L.codeAreaY - L.statusH;
-    L.statusY   = H - L.statusH;
+    L.statusY = H - L.statusH;
   }
 
   function measureChar() {
@@ -173,9 +289,9 @@ const Recorder = (function () {
   }
 
   function recalcCodeMetrics() {
-    // Dynamic line number width based on total lines
     const digits = state.parsedData
-      ? Math.max(2, String(state.parsedData.lines.length).length) : 2;
+      ? Math.max(2, String(state.parsedData.lines.length).length)
+      : 2;
     L.lineNumW = r(digits * charW + L.lineNumPadR + 12 * L.s);
     L.codeX = L.lineNumW;
     L.codeW = L.W - L.lineNumW - L.codePadR;
@@ -183,10 +299,12 @@ const Recorder = (function () {
     visibleRows = Math.max(1, Math.floor((L.codeAreaH - L.codePadTop * 2) / L.lineH));
   }
 
-  function r(v) { return Math.round(v); }
+  function r(v) {
+    return Math.round(v);
+  }
 
   // ============================================================
-  //  STATE MANAGEMENT
+  // STATE MANAGEMENT
   // ============================================================
 
   function setParsedData(data) {
@@ -214,12 +332,16 @@ const Recorder = (function () {
     calcScroll();
   }
 
-  function setComplete(v) { typingDone = v; }
+  function setComplete(v) {
+    typingDone = v;
+  }
 
   function calcScroll() {
     if (!state.parsedData) return;
+
     let rows = 0;
     const lines = state.parsedData.lines;
+
     for (let i = 0; i <= state.currentLine && i < lines.length; i++) {
       if (i < state.currentLine) {
         rows += Math.max(1, Math.ceil(Math.max(1, lines[i].charCount) / maxCharsPerRow));
@@ -227,19 +349,25 @@ const Recorder = (function () {
         rows += Math.floor(state.currentChar / maxCharsPerRow) + 1;
       }
     }
+
     const margin = Math.max(3, Math.floor(visibleRows * 0.15));
     const needed = rows - (visibleRows - margin);
+
     if (needed > state.scrollOffset) state.scrollOffset = needed;
     if (state.scrollOffset < 0) state.scrollOffset = 0;
   }
 
   // ============================================================
-  //  RECORDING CONTROL
+  // RECORDING CONTROL
   // ============================================================
 
   function startRecording() {
     return new Promise((resolve, reject) => {
-      if (!canvas) { reject(new Error('Not initialized')); return; }
+      if (!canvas) {
+        reject(new Error('Recorder not initialized'));
+        return;
+      }
+
       measureChar();
       chunks = [];
       recording = true;
@@ -247,22 +375,33 @@ const Recorder = (function () {
       smoothScroll = 0;
 
       let stream;
-      try { stream = canvas.captureStream(config.fps); }
-      catch (e) { reject(new Error('captureStream unsupported')); return; }
+      try {
+        stream = canvas.captureStream(config.fps);
+      } catch (e) {
+        reject(new Error('captureStream unsupported'));
+        return;
+      }
 
-      const mime = getBestMime();
-      if (!mime) { reject(new Error('No supported video codec')); return; }
+      const mime = BrowserSupport.getMimeType(config.format);
+      if (!mime) {
+        reject(new Error('No supported recording format found'));
+        return;
+      }
 
       try {
         mediaRecorder = new MediaRecorder(stream, {
           mimeType: mime,
           videoBitsPerSecond: config.bitrate,
         });
-      } catch (e) { reject(new Error('MediaRecorder failed')); return; }
+      } catch (e) {
+        reject(new Error('MediaRecorder failed: ' + e.message));
+        return;
+      }
 
       mediaRecorder.ondataavailable = e => {
         if (e.data && e.data.size > 0) chunks.push(e.data);
       };
+
       mediaRecorder.start(100);
       lastFrameTime = performance.now();
       tick(performance.now());
@@ -273,38 +412,50 @@ const Recorder = (function () {
   function stopRecording() {
     return new Promise(resolve => {
       recording = false;
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+
       if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        resolve(chunks.length ? new Blob(chunks, { type: 'video/webm' }) : null);
+        const type = config.format === 'mp4' ? 'video/mp4' : 'video/webm';
+        resolve(chunks.length ? new Blob(chunks, { type }) : null);
         return;
       }
+
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mediaRecorder.mimeType || 'video/webm' });
+        const type = mediaRecorder.mimeType || (config.format === 'mp4' ? 'video/mp4' : 'video/webm');
+        const blob = new Blob(chunks, { type });
         mediaRecorder = null;
         resolve(blob);
       };
+
       mediaRecorder.stop();
     });
   }
 
-  function isRecording() { return recording; }
+  function isRecording() {
+    return recording;
+  }
 
   // ============================================================
-  //  RENDER LOOP
+  // RENDER LOOP
   // ============================================================
 
   function tick(ts) {
     if (!recording) return;
+
     const interval = 1000 / config.fps;
     if (ts - lastFrameTime >= interval) {
       lastFrameTime = ts - ((ts - lastFrameTime) % interval);
       render();
     }
+
     rafId = requestAnimationFrame(tick);
   }
 
   function render() {
-    // Smooth scroll interpolation
     smoothScroll += (state.scrollOffset - smoothScroll) * 0.18;
     if (Math.abs(smoothScroll - state.scrollOffset) < 0.05) {
       smoothScroll = state.scrollOffset;
@@ -321,7 +472,7 @@ const Recorder = (function () {
   }
 
   // ============================================================
-  //  DRAW — TITLE BAR
+  // DRAW — TITLE BAR
   // ============================================================
 
   function drawTitleBar() {
@@ -332,10 +483,10 @@ const Recorder = (function () {
     ctx.fillStyle = C.titleBorder;
     ctx.fillRect(0, h - 1, L.W, 1);
 
-    // Traffic lights
     const cy = h / 2;
     const sx = L.titlePadX + L.dotR;
     const colors = [C.dotRed, C.dotYellow, C.dotGreen];
+
     for (let i = 0; i < 3; i++) {
       ctx.beginPath();
       ctx.arc(sx + i * (L.dotR * 2 + L.dotGap), cy, L.dotR, 0, Math.PI * 2);
@@ -343,7 +494,6 @@ const Recorder = (function () {
       ctx.fill();
     }
 
-    // Centered title
     ctx.font = `500 ${L.titleFont}px ${config.uiFont}`;
     ctx.fillStyle = C.muted;
     ctx.textAlign = 'center';
@@ -353,7 +503,7 @@ const Recorder = (function () {
   }
 
   // ============================================================
-  //  DRAW — TAB BAR
+  // DRAW — TAB BAR
   // ============================================================
 
   function drawTabBar() {
@@ -364,36 +514,30 @@ const Recorder = (function () {
     ctx.fillStyle = C.titleBorder;
     ctx.fillRect(0, y + h - 1, L.W, 1);
 
-    // Measure tab width
     ctx.font = `${L.tabFont}px ${config.uiFont}`;
     const tw = ctx.measureText(state.fileName).width;
     const tabW = Math.min(L.W * 0.55, tw + L.tabPadX * 2 + 30 * L.s);
 
-    // Active tab
     ctx.fillStyle = C.tabActive;
     ctx.fillRect(0, y, tabW, h);
 
-    // Accent
     ctx.fillStyle = C.tabAccent;
     ctx.fillRect(0, y + h - L.tabAccent - 1, tabW, L.tabAccent);
 
-    // Right border
     ctx.fillStyle = C.titleBorder;
     ctx.fillRect(tabW, y, 1, h);
 
-    // Filename
     ctx.font = `${L.tabFont}px ${config.uiFont}`;
     ctx.fillStyle = C.white;
     ctx.textBaseline = 'middle';
     ctx.fillText(state.fileName, L.tabPadX, y + h / 2);
 
-    // Close ×
     ctx.fillStyle = C.muted;
     ctx.fillText('×', tabW - L.tabPadX, y + h / 2);
   }
 
   // ============================================================
-  //  DRAW — CODE AREA
+  // DRAW — CODE AREA
   // ============================================================
 
   function drawCode() {
@@ -411,20 +555,19 @@ const Recorder = (function () {
       const line = lines[li];
       const rows = Math.max(1, Math.ceil(Math.max(1, line.charCount) / maxCharsPerRow));
 
-      // Skip above viewport
-      if (visRow + rows <= smoothScroll - 1) { visRow += rows; continue; }
+      if (visRow + rows <= smoothScroll - 1) {
+        visRow += rows;
+        continue;
+      }
 
-      // Below viewport
       const firstOff = visRow - smoothScroll;
       if (firstOff >= visibleRows + 2) break;
 
-      // Chars to show
       let show;
-      if (li < state.currentLine)      show = line.charCount;
+      if (li < state.currentLine) show = line.charCount;
       else if (li === state.currentLine) show = state.currentChar;
       else break;
 
-      // Current line highlight
       if (li === state.currentLine) {
         const curRow = Math.floor(state.currentChar / maxCharsPerRow);
         const hlOff = firstOff + curRow;
@@ -435,7 +578,6 @@ const Recorder = (function () {
         }
       }
 
-      // Line number
       if (firstOff >= -1 && firstOff < visibleRows + 1) {
         const lnY = L.codeAreaY + L.codePadTop + firstOff * L.lineH + L.lineH / 2;
         ctx.fillStyle = (li === state.currentLine) ? C.lineNumActive : C.lineNum;
@@ -446,10 +588,8 @@ const Recorder = (function () {
         ctx.textAlign = 'left';
       }
 
-      // Tokens
       renderTokens(line.tokens, show, visRow);
 
-      // Cursor
       if (li === state.currentLine) drawCursor(show, visRow);
 
       visRow += rows;
@@ -461,7 +601,9 @@ const Recorder = (function () {
   function renderTokens(tokens, maxChars, startRow) {
     if (maxChars <= 0) return;
 
-    let drawn = 0, x = L.codeX, row = 0;
+    let drawn = 0;
+    let x = L.codeX;
+    let row = 0;
     const stack = [C.text];
 
     ctx.font = `${L.fontSize}px ${config.fontFamily}`;
@@ -476,7 +618,6 @@ const Recorder = (function () {
       } else if (tk.type === 'close') {
         if (stack.length > 1) stack.pop();
       } else if (tk.type === 'text') {
-        if (drawn >= maxChars) break;
         const off = startRow + row - smoothScroll;
 
         if (off >= -1 && off < visibleRows + 2) {
@@ -492,7 +633,10 @@ const Recorder = (function () {
         x += charW;
         drawn++;
 
-        if (x + charW > L.W - L.codePadR) { x = L.codeX; row++; }
+        if (x + charW > L.W - L.codePadR) {
+          x = L.codeX;
+          row++;
+        }
       }
     }
   }
@@ -517,13 +661,12 @@ const Recorder = (function () {
   }
 
   // ============================================================
-  //  DRAW — SCROLLBAR
+  // DRAW — SCROLLBAR
   // ============================================================
 
   function drawScrollbar() {
     if (!state.parsedData) return;
 
-    // Count revealed visual rows
     let revRows = 0;
     const lines = state.parsedData.lines;
     for (let i = 0; i <= state.currentLine && i < lines.length; i++) {
@@ -536,11 +679,9 @@ const Recorder = (function () {
     const tY = L.codeAreaY;
     const tH = L.codeAreaH;
 
-    // Track
     ctx.fillStyle = C.scrollTrack;
     ctx.fillRect(tX, tY, L.sbW, tH);
 
-    // Thumb
     const ratio = visibleRows / revRows;
     const thumbH = Math.max(L.sbMinThumb, tH * ratio);
     const maxSc = revRows - visibleRows;
@@ -548,13 +689,12 @@ const Recorder = (function () {
     const thumbY = tY + pos * (tH - thumbH);
 
     ctx.fillStyle = C.scrollThumb;
-    rrect(tX + L.sbPad, thumbY, L.sbW - L.sbPad * 2, thumbH,
-      (L.sbW - L.sbPad * 2) / 2);
+    rrect(tX + L.sbPad, thumbY, L.sbW - L.sbPad * 2, thumbH, (L.sbW - L.sbPad * 2) / 2);
     ctx.fill();
   }
 
   // ============================================================
-  //  DRAW — STATUS BAR
+  // DRAW — STATUS BAR
   // ============================================================
 
   function drawStatusBar() {
@@ -570,14 +710,12 @@ const Recorder = (function () {
     ctx.textBaseline = 'middle';
     ctx.fillStyle = C.muted;
 
-    // Left
     ctx.textAlign = 'left';
     ctx.fillText(state.language, L.statusPadX, mid);
 
     const utf8X = L.statusPadX + ctx.measureText(state.language).width + 20 * L.s;
     ctx.fillText('UTF-8', utf8X, mid);
 
-    // Right
     ctx.textAlign = 'right';
     const pos = `Ln ${state.currentLine + 1}, Col ${state.currentChar + 1}`;
     ctx.fillText(pos, L.W - L.statusPadX, mid);
@@ -589,12 +727,13 @@ const Recorder = (function () {
   }
 
   // ============================================================
-  //  HELPERS
+  // HELPERS
   // ============================================================
 
   function rrect(x, y, w, h, rad) {
     rad = Math.min(rad, w / 2, h / 2);
     if (rad < 0) rad = 0;
+
     ctx.beginPath();
     ctx.moveTo(x + rad, y);
     ctx.lineTo(x + w - rad, y);
@@ -617,30 +756,27 @@ const Recorder = (function () {
     return null;
   }
 
-  function getBestMime() {
-    const types = [
-      'video/webm;codecs=vp9', 'video/webm;codecs=vp8',
-      'video/webm', 'video/mp4',
-    ];
-    for (const t of types) {
-      if (MediaRecorder.isTypeSupported(t)) return t;
-    }
-    return null;
-  }
-
   function isSupported() {
     return !!(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
   }
 
-  function getCanvas() { return canvas; }
-
-  // ============================================================
-  //  PUBLIC API
-  // ============================================================
+  function getCanvas() {
+    return canvas;
+  }
 
   return {
-    init, setParsedData, setMeta, updateState, setComplete,
-    startRecording, stopRecording, isRecording, isSupported, getCanvas,
+    init,
+    setParsedData,
+    setMeta,
+    updateState,
+    setComplete,
+    startRecording,
+    stopRecording,
+    isRecording,
+    isSupported,
+    getCanvas,
+    getBrowserSupport: () => BrowserSupport,
+    getQualityPresets: () => QualityPresets,
+    getConfig: () => config,
   };
-
 })();

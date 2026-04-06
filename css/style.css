@@ -692,3 +692,24 @@ body {
         max-height: 260px;
     }
 }
+.info-message,
+.warning-message {
+    margin-top: 10px;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.info-message {
+    background: rgba(122, 162, 247, 0.12);
+    border: 1px solid rgba(122, 162, 247, 0.28);
+    color: #a9b1d6;
+}
+
+.warning-message {
+    background: rgba(255, 158, 100, 0.12);
+    border: 1px solid rgba(255, 158, 100, 0.28);
+    color: #ff9e64;
+}

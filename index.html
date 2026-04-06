@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeType Studio</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/editor.css">
     <link rel="stylesheet" href="css/responsive.css">
@@ -16,7 +18,6 @@
 <body>
     <div class="app-container" id="appContainer">
 
-        <!-- ===== INPUT PANEL ===== -->
         <div class="input-panel" id="inputPanel">
             <div class="logo">
                 <span class="logo-icon">⌨️</span>
@@ -70,6 +71,7 @@ console.log(result);</textarea>
                         <option value="markdown">Markdown</option>
                     </select>
                 </div>
+
                 <div class="input-group half">
                     <label for="fileNameInput">File Name</label>
                     <input type="text" id="fileNameInput" value="index.js" placeholder="main.py">
@@ -104,35 +106,46 @@ console.log(result);</textarea>
                 </label>
             </div>
 
-            <!-- Recording Settings -->
             <div class="section-divider"><span>Recording</span></div>
 
-            <div class="settings-row">
+            <div class="settings-row" id="formatRow">
                 <div class="input-group half">
-                    <label for="resolutionSelect">Resolution</label>
-                    <select id="resolutionSelect">
-                        <option value="1080x1920" selected>1080×1920 (Vertical)</option>
-                        <option value="720x1280">720×1280 (Vertical)</option>
-                        <option value="1920x1080">1920×1080 (Landscape)</option>
-                        <option value="1280x720">1280×720 (Landscape)</option>
+                    <label for="formatSelect">Format</label>
+                    <select id="formatSelect">
+                        <option value="webm">WebM</option>
+                        <option value="mp4">MP4</option>
                     </select>
                 </div>
+
                 <div class="input-group half">
-                    <label for="endBufferSlider">End Buffer: <span id="endBufferValue">2</span>s</label>
-                    <input type="range" id="endBufferSlider" min="0" max="5" value="2" step="0.5">
+                    <label for="qualitySelect">Quality</label>
+                    <select id="qualitySelect">
+                        <option value="1080p">Full HD</option>
+                        <option value="2k">2K</option>
+                        <option value="4k">4K Ultra HD</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Buttons -->
+            <div class="info-message" id="formatInfo" style="display:none;"></div>
+            <div class="warning-message" id="qualityWarning" style="display:none;"></div>
+
+            <div class="input-group">
+                <label for="endBufferSlider">End Buffer: <span id="endBufferValue">2</span>s</label>
+                <input type="range" id="endBufferSlider" min="0" max="5" value="2" step="0.5">
+            </div>
+
             <div class="control-buttons">
                 <button class="btn btn-play" id="btnPlay">
                     <span class="btn-icon" id="playIcon">▶</span>
                     <span id="playText">Play</span>
                 </button>
+
                 <button class="btn btn-record" id="btnRecord">
                     <span class="btn-icon" id="recordIcon">⏺</span>
                     <span id="recordText">Record</span>
                 </button>
+
                 <button class="btn btn-reset" id="btnReset">
                     <span class="btn-icon">⟲</span>
                     <span>Reset</span>
@@ -145,10 +158,7 @@ console.log(result);</textarea>
             </div>
         </div>
 
-        <!-- ===== OUTPUT PANEL ===== -->
         <div class="output-panel" id="outputPanel">
-
-            <!-- DOM Editor (Play mode) -->
             <div class="editor-window" id="editorWindow">
                 <div class="editor-titlebar">
                     <div class="window-dots">
@@ -163,6 +173,7 @@ console.log(result);</textarea>
                         <span class="win-btn">×</span>
                     </div>
                 </div>
+
                 <div class="editor-tabs">
                     <div class="tab active" id="editorTab">
                         <span class="tab-icon" id="tabIcon">📄</span>
@@ -170,6 +181,7 @@ console.log(result);</textarea>
                         <span class="tab-close">×</span>
                     </div>
                 </div>
+
                 <div class="editor-body" id="editorBody">
                     <div class="code-area" id="codeArea">
                         <div class="code-line" data-line="1">
@@ -178,6 +190,7 @@ console.log(result);</textarea>
                         </div>
                     </div>
                 </div>
+
                 <div class="editor-statusbar">
                     <div class="status-left">
                         <span class="status-item" id="statusLanguage">JavaScript</span>
@@ -190,10 +203,8 @@ console.log(result);</textarea>
                 </div>
             </div>
 
-            <!-- Canvas Preview (Record mode) -->
             <div class="canvas-preview" id="canvasPreview"></div>
 
-            <!-- Recording Indicator -->
             <div class="recording-indicator" id="recordingIndicator">
                 <span class="rec-dot"></span>
                 <span class="rec-label">REC</span>
@@ -202,21 +213,24 @@ console.log(result);</textarea>
         </div>
     </div>
 
-    <!-- Download Overlay -->
     <div class="download-overlay" id="downloadOverlay">
         <div class="download-card">
             <div class="download-header">
                 <span class="download-icon">🎬</span>
                 <h2>Recording Complete!</h2>
             </div>
+
             <div class="download-preview">
                 <video id="previewVideo" controls playsinline></video>
             </div>
+
             <div class="download-info">
                 <span id="downloadSize">—</span>
                 <span id="downloadDuration">—</span>
                 <span id="downloadResolution">—</span>
+                <span id="downloadFormat">—</span>
             </div>
+
             <div class="download-actions">
                 <button class="btn btn-download" id="btnDownload">
                     <span class="btn-icon">⬇</span>
