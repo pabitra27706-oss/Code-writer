@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CodeType Studio</title>
+    <meta name="description" content="Transform your code into beautiful typing animations — record and share as MP4 or WebM video">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1b26">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CodeType">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='32' fill='%231a1b26'/%3E%3Ctext x='90' y='125' font-size='90' text-anchor='middle' fill='%23ffffff'%3E⌨️%3C/text%3E%3C/svg%3E">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -825,6 +834,69 @@ console.log(result);</textarea>
 <script src="js/typing-engine.js"></script>
 <script src="js/recorder.js"></script>
 <script src="js/app.js"></script>
+
+<!-- PWA Install & Service Worker Registration -->
+<script>
+// Register service worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+                console.log('✅ Service Worker registered:', reg.scope);
+                
+                // Check for updates every 60 seconds
+                setInterval(() => {
+                    reg.update();
+                }, 60000);
+            })
+            .catch(err => {
+                console.error('❌ Service Worker registration failed:', err);
+            });
+    });
+}
+
+// Handle install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    console.log('💾 PWA install available');
+    
+    // Auto-show prompt after 30 seconds if not installed
+    setTimeout(() => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(choice => {
+                if (choice.outcome === 'accepted') {
+                    console.log('✅ User installed PWA');
+                } else {
+                    console.log('❌ User dismissed install');
+                }
+                deferredPrompt = null;
+            });
+        }
+    }, 30000);
+});
+
+// Detect when app is installed
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 PWA installed successfully');
+    deferredPrompt = null;
+});
+
+// Handle share target (if shared from another app)
+if (window.location.search.includes('title=') || window.location.search.includes('text=')) {
+    const params = new URLSearchParams(window.location.search);
+    const sharedText = params.get('text') || params.get('title') || '';
+    if (sharedText && document.getElementById('codeInput')) {
+        document.getElementById('codeInput').value = sharedText;
+        if (document.getElementById('mobileCodeInput')) {
+            document.getElementById('mobileCodeInput').value = sharedText;
+        }
+    }
+}
+</script>
 
 </body>
 </html>
