@@ -1,0 +1,506 @@
+/* =============================================
+   THEMES.CSS
+   All theme CSS variables scoped correctly
+   ============================================= */
+
+/* ============================================================
+   SET VARIABLES ON HTML ROOT AND EDITOR WINDOW
+   Both selectors needed:
+   - html[data-theme] for global CSS var access
+   - [data-theme] for editor-window scoped access
+   ============================================================ */
+
+/* ---------- Tokyo Night (Default) ---------- */
+html,
+html[data-theme="tokyo-night"],
+[data-theme="tokyo-night"] {
+    --editor-bg:           #1a1b26;
+    --editor-bar:          #16161e;
+    --editor-border:       #101014;
+    --editor-text:         #a9b1d6;
+    --editor-cursor:       #c0caf5;
+    --editor-linenum:      #363b54;
+    --editor-linenum-active: #c0caf5;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #58a6ff;
+
+    --syn-keyword:    #bb9af7;
+    --syn-string:     #9ece6a;
+    --syn-number:     #ff9e64;
+    --syn-comment:    #565f89;
+    --syn-function:   #7aa2f7;
+    --syn-title:      #7aa2f7;
+    --syn-builtin:    #e0af68;
+    --syn-literal:    #ff9e64;
+    --syn-type:       #2ac3de;
+    --syn-params:     #e0af68;
+    --syn-meta:       #89ddff;
+    --syn-attr:       #7aa2f7;
+    --syn-attribute:  #bb9af7;
+    --syn-tag:        #f7768e;
+    --syn-operator:   #89ddff;
+    --syn-property:   #73daca;
+    --syn-punctuation:#89ddff;
+    --syn-variable:   #c0caf5;
+    --syn-regexp:     #b4f9f8;
+    --syn-symbol:     #bb9af7;
+    --syn-selector:   #9ece6a;
+    --syn-name:       #f7768e;
+    --syn-subst:      #c0caf5;
+}
+
+/* ---------- Dracula ---------- */
+html[data-theme="dracula"],
+[data-theme="dracula"] {
+    --editor-bg:           #282a36;
+    --editor-bar:          #21222c;
+    --editor-border:       #191a21;
+    --editor-text:         #f8f8f2;
+    --editor-cursor:       #f8f8f0;
+    --editor-linenum:      #6272a4;
+    --editor-linenum-active: #f8f8f2;
+    --editor-curline:      rgba(255,255,255,0.05);
+    --editor-scroll-thumb: rgba(255,255,255,0.12);
+    --tab-accent:          #bd93f9;
+
+    --syn-keyword:    #ff79c6;
+    --syn-string:     #f1fa8c;
+    --syn-number:     #bd93f9;
+    --syn-comment:    #6272a4;
+    --syn-function:   #50fa7b;
+    --syn-title:      #50fa7b;
+    --syn-builtin:    #8be9fd;
+    --syn-literal:    #bd93f9;
+    --syn-type:       #8be9fd;
+    --syn-params:     #ffb86c;
+    --syn-meta:       #ff79c6;
+    --syn-attr:       #50fa7b;
+    --syn-attribute:  #ff79c6;
+    --syn-tag:        #ff79c6;
+    --syn-operator:   #ff79c6;
+    --syn-property:   #66d9e8;
+    --syn-punctuation:#f8f8f2;
+    --syn-variable:   #f8f8f2;
+    --syn-regexp:     #f1fa8c;
+    --syn-symbol:     #bd93f9;
+    --syn-selector:   #f1fa8c;
+    --syn-name:       #ff79c6;
+    --syn-subst:      #f8f8f2;
+}
+
+/* ---------- GitHub Dark ---------- */
+html[data-theme="github-dark"],
+[data-theme="github-dark"] {
+    --editor-bg:           #0d1117;
+    --editor-bar:          #010409;
+    --editor-border:       #21262d;
+    --editor-text:         #e6edf3;
+    --editor-cursor:       #e6edf3;
+    --editor-linenum:      #484f58;
+    --editor-linenum-active: #e6edf3;
+    --editor-curline:      rgba(255,255,255,0.03);
+    --editor-scroll-thumb: rgba(255,255,255,0.08);
+    --tab-accent:          #58a6ff;
+
+    --syn-keyword:    #ff7b72;
+    --syn-string:     #a5d6ff;
+    --syn-number:     #79c0ff;
+    --syn-comment:    #8b949e;
+    --syn-function:   #d2a8ff;
+    --syn-title:      #d2a8ff;
+    --syn-builtin:    #ffa657;
+    --syn-literal:    #79c0ff;
+    --syn-type:       #79c0ff;
+    --syn-params:     #e6edf3;
+    --syn-meta:       #79c0ff;
+    --syn-attr:       #79c0ff;
+    --syn-attribute:  #ff7b72;
+    --syn-tag:        #7ee787;
+    --syn-operator:   #ff7b72;
+    --syn-property:   #79c0ff;
+    --syn-punctuation:#e6edf3;
+    --syn-variable:   #ffa657;
+    --syn-regexp:     #a5d6ff;
+    --syn-symbol:     #79c0ff;
+    --syn-selector:   #7ee787;
+    --syn-name:       #7ee787;
+    --syn-subst:      #e6edf3;
+}
+
+/* ---------- Monokai ---------- */
+html[data-theme="monokai"],
+[data-theme="monokai"] {
+    --editor-bg:           #272822;
+    --editor-bar:          #1e1f1c;
+    --editor-border:       #141411;
+    --editor-text:         #f8f8f2;
+    --editor-cursor:       #f8f8f0;
+    --editor-linenum:      #75715e;
+    --editor-linenum-active: #f8f8f2;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #a6e22e;
+
+    --syn-keyword:    #f92672;
+    --syn-string:     #e6db74;
+    --syn-number:     #ae81ff;
+    --syn-comment:    #75715e;
+    --syn-function:   #a6e22e;
+    --syn-title:      #a6e22e;
+    --syn-builtin:    #66d9e8;
+    --syn-literal:    #ae81ff;
+    --syn-type:       #66d9e8;
+    --syn-params:     #fd971f;
+    --syn-meta:       #f92672;
+    --syn-attr:       #a6e22e;
+    --syn-attribute:  #f92672;
+    --syn-tag:        #f92672;
+    --syn-operator:   #f92672;
+    --syn-property:   #66d9e8;
+    --syn-punctuation:#f8f8f2;
+    --syn-variable:   #f8f8f2;
+    --syn-regexp:     #e6db74;
+    --syn-symbol:     #ae81ff;
+    --syn-selector:   #e6db74;
+    --syn-name:       #f92672;
+    --syn-subst:      #f8f8f2;
+}
+
+/* ---------- Nord ---------- */
+html[data-theme="nord"],
+[data-theme="nord"] {
+    --editor-bg:           #2e3440;
+    --editor-bar:          #242933;
+    --editor-border:       #1a1e27;
+    --editor-text:         #d8dee9;
+    --editor-cursor:       #eceff4;
+    --editor-linenum:      #4c566a;
+    --editor-linenum-active: #d8dee9;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #88c0d0;
+
+    --syn-keyword:    #81a1c1;
+    --syn-string:     #a3be8c;
+    --syn-number:     #b48ead;
+    --syn-comment:    #4c566a;
+    --syn-function:   #88c0d0;
+    --syn-title:      #8fbcbb;
+    --syn-builtin:    #81a1c1;
+    --syn-literal:    #b48ead;
+    --syn-type:       #8fbcbb;
+    --syn-params:     #d8dee9;
+    --syn-meta:       #5e81ac;
+    --syn-attr:       #8fbcbb;
+    --syn-attribute:  #81a1c1;
+    --syn-tag:        #81a1c1;
+    --syn-operator:   #81a1c1;
+    --syn-property:   #88c0d0;
+    --syn-punctuation:#d8dee9;
+    --syn-variable:   #d8dee9;
+    --syn-regexp:     #ebcb8b;
+    --syn-symbol:     #b48ead;
+    --syn-selector:   #a3be8c;
+    --syn-name:       #81a1c1;
+    --syn-subst:      #d8dee9;
+}
+
+/* ---------- Solarized Dark ---------- */
+html[data-theme="solarized-dark"],
+[data-theme="solarized-dark"] {
+    --editor-bg:           #002b36;
+    --editor-bar:          #00212b;
+    --editor-border:       #001a22;
+    --editor-text:         #839496;
+    --editor-cursor:       #93a1a1;
+    --editor-linenum:      #586e75;
+    --editor-linenum-active: #93a1a1;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #268bd2;
+
+    --syn-keyword:    #859900;
+    --syn-string:     #2aa198;
+    --syn-number:     #d33682;
+    --syn-comment:    #586e75;
+    --syn-function:   #268bd2;
+    --syn-title:      #268bd2;
+    --syn-builtin:    #b58900;
+    --syn-literal:    #d33682;
+    --syn-type:       #2aa198;
+    --syn-params:     #cb4b16;
+    --syn-meta:       #cb4b16;
+    --syn-attr:       #268bd2;
+    --syn-attribute:  #859900;
+    --syn-tag:        #268bd2;
+    --syn-operator:   #859900;
+    --syn-property:   #2aa198;
+    --syn-punctuation:#839496;
+    --syn-variable:   #839496;
+    --syn-regexp:     #2aa198;
+    --syn-symbol:     #cb4b16;
+    --syn-selector:   #2aa198;
+    --syn-name:       #268bd2;
+    --syn-subst:      #839496;
+}
+
+/* ---------- One Dark Pro ---------- */
+html[data-theme="one-dark"],
+[data-theme="one-dark"] {
+    --editor-bg:           #282c34;
+    --editor-bar:          #21252b;
+    --editor-border:       #181a1f;
+    --editor-text:         #abb2bf;
+    --editor-cursor:       #528bff;
+    --editor-linenum:      #495162;
+    --editor-linenum-active: #abb2bf;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #61afef;
+
+    --syn-keyword:    #c678dd;
+    --syn-string:     #98c379;
+    --syn-number:     #d19a66;
+    --syn-comment:    #5c6370;
+    --syn-function:   #61afef;
+    --syn-title:      #61afef;
+    --syn-builtin:    #e5c07b;
+    --syn-literal:    #d19a66;
+    --syn-type:       #e5c07b;
+    --syn-params:     #e06c75;
+    --syn-meta:       #c678dd;
+    --syn-attr:       #61afef;
+    --syn-attribute:  #c678dd;
+    --syn-tag:        #e06c75;
+    --syn-operator:   #abb2bf;
+    --syn-property:   #e06c75;
+    --syn-punctuation:#abb2bf;
+    --syn-variable:   #e06c75;
+    --syn-regexp:     #98c379;
+    --syn-symbol:     #d19a66;
+    --syn-selector:   #98c379;
+    --syn-name:       #e06c75;
+    --syn-subst:      #abb2bf;
+}
+
+/* ---------- Catppuccin Mocha ---------- */
+html[data-theme="catppuccin"],
+[data-theme="catppuccin"] {
+    --editor-bg:           #1e1e2e;
+    --editor-bar:          #181825;
+    --editor-border:       #11111b;
+    --editor-text:         #cdd6f4;
+    --editor-cursor:       #f5e0dc;
+    --editor-linenum:      #45475a;
+    --editor-linenum-active: #cdd6f4;
+    --editor-curline:      rgba(255,255,255,0.04);
+    --editor-scroll-thumb: rgba(255,255,255,0.10);
+    --tab-accent:          #89b4fa;
+
+    --syn-keyword:    #cba6f7;
+    --syn-string:     #a6e3a1;
+    --syn-number:     #fab387;
+    --syn-comment:    #6c7086;
+    --syn-function:   #89b4fa;
+    --syn-title:      #89dceb;
+    --syn-builtin:    #f9e2af;
+    --syn-literal:    #fab387;
+    --syn-type:       #89dceb;
+    --syn-params:     #cdd6f4;
+    --syn-meta:       #89dceb;
+    --syn-attr:       #89b4fa;
+    --syn-attribute:  #cba6f7;
+    --syn-tag:        #f38ba8;
+    --syn-operator:   #89dceb;
+    --syn-property:   #94e2d5;
+    --syn-punctuation:#cdd6f4;
+    --syn-variable:   #cdd6f4;
+    --syn-regexp:     #a6e3a1;
+    --syn-symbol:     #cba6f7;
+    --syn-selector:   #a6e3a1;
+    --syn-name:       #f38ba8;
+    --syn-subst:      #cdd6f4;
+}
+
+/* ============================================================
+   APPLY THEME VARS TO EDITOR ELEMENTS
+   These rules use the CSS vars set above
+   ============================================================ */
+
+.editor-window {
+    background:   var(--editor-bg);
+    border-color: var(--editor-border);
+}
+
+.editor-titlebar,
+.editor-tabs,
+.editor-statusbar {
+    background:   var(--editor-bar);
+    border-color: var(--editor-border);
+}
+
+.editor-body {
+    background: var(--editor-bg);
+}
+
+.tab.active {
+    background: var(--editor-bg);
+    color:      var(--editor-text);
+}
+
+.tab.active::after {
+    background: var(--tab-accent);
+}
+
+.line-number {
+    color: var(--editor-linenum);
+}
+
+.code-line:hover     .line-number,
+.code-line.active-line .line-number {
+    color: var(--editor-linenum-active);
+}
+
+.line-content {
+    color: var(--editor-text);
+}
+
+.cursor {
+    color: var(--editor-cursor);
+}
+
+/* ============================================================
+   SYNTAX HIGHLIGHTING — via CSS variables
+   These OVERRIDE anything highlight.js injects
+   ============================================================ */
+
+.line-content .hljs-keyword,
+.line-content .hljs-selector-tag {
+    color: var(--syn-keyword) !important;
+}
+
+.line-content .hljs-string,
+.line-content .hljs-selector-class {
+    color: var(--syn-string) !important;
+}
+
+.line-content .hljs-number {
+    color: var(--syn-number) !important;
+}
+
+.line-content .hljs-comment,
+.line-content .hljs-doctag {
+    color: var(--syn-comment) !important;
+    font-style: italic;
+}
+
+.line-content .hljs-function {
+    color: var(--syn-function) !important;
+}
+
+.line-content .hljs-title,
+.line-content .hljs-title.function_,
+.line-content .hljs-title.class_ {
+    color: var(--syn-title) !important;
+}
+
+.line-content .hljs-built_in {
+    color: var(--syn-builtin) !important;
+}
+
+.line-content .hljs-literal {
+    color: var(--syn-literal) !important;
+}
+
+.line-content .hljs-type {
+    color: var(--syn-type) !important;
+}
+
+.line-content .hljs-params {
+    color: var(--syn-params) !important;
+}
+
+.line-content .hljs-meta,
+.line-content .hljs-meta .hljs-keyword {
+    color: var(--syn-meta) !important;
+}
+
+.line-content .hljs-attr {
+    color: var(--syn-attr) !important;
+}
+
+.line-content .hljs-attribute {
+    color: var(--syn-attribute) !important;
+}
+
+.line-content .hljs-tag {
+    color: var(--syn-tag) !important;
+}
+
+.line-content .hljs-name {
+    color: var(--syn-name) !important;
+}
+
+.line-content .hljs-operator {
+    color: var(--syn-operator) !important;
+}
+
+.line-content .hljs-property {
+    color: var(--syn-property) !important;
+}
+
+.line-content .hljs-punctuation {
+    color: var(--syn-punctuation) !important;
+}
+
+.line-content .hljs-variable,
+.line-content .hljs-template-variable {
+    color: var(--syn-variable) !important;
+}
+
+.line-content .hljs-regexp {
+    color: var(--syn-regexp) !important;
+}
+
+.line-content .hljs-symbol {
+    color: var(--syn-symbol) !important;
+}
+
+.line-content .hljs-selector-id {
+    color: var(--syn-attr) !important;
+}
+
+.line-content .hljs-subst {
+    color: var(--syn-subst) !important;
+}
+
+.line-content .hljs-section {
+    color: var(--syn-title) !important;
+    font-weight: bold;
+}
+
+.line-content .hljs-bullet {
+    color: var(--syn-keyword) !important;
+}
+
+.line-content .hljs-emphasis {
+    font-style: italic;
+}
+
+.line-content .hljs-strong {
+    font-weight: bold;
+}
+
+.line-content .hljs-link {
+    color: var(--syn-string) !important;
+    text-decoration: underline;
+}
+
+.line-content .hljs-addition {
+    color: var(--syn-string) !important;
+}
+
+.line-content .hljs-deletion {
+    color: var(--syn-tag) !important;
+}

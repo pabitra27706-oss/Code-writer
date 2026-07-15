@@ -2,159 +2,237 @@
    RESPONSIVE.CSS — Mobile & Tablet Breakpoints
    ============================================= */
 
-/* ---------- Tablets (< 1024px) ---------- */
-@media screen and (max-width: 1024px) {
-  .app-container {
-    flex-direction: column;
-  }
-  
-  .input-panel {
-    width: 100%;
-    min-width: unset;
-    max-height: none;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: 20px 16px;
-  }
-  
-  .output-panel {
-    min-height: auto;
-    padding: 20px;
-  }
-  
-  .editor-window {
-    max-width: 100%;
-  }
-  
-  .editor-body {
-    max-height: 50vh;
-  }
+/* ---------- Large screens (> 1400px) ---------- */
+@media screen and (min-width: 1400px) {
+    .input-panel    { width: 420px; }
+    .editor-window  { max-width: 900px; }
 }
 
-/* ---------- Mobile (< 640px) ---------- */
-@media screen and (max-width: 640px) {
-  .input-panel {
-    padding: 16px 12px;
-    gap: 14px;
-  }
-  
-  .settings-row {
-    flex-direction: column;
-    gap: 14px;
-  }
-  
-  .control-buttons {
-    flex-direction: column;
-  }
-  
-  .btn {
-    min-width: unset;
-    padding: 12px 16px;
-  }
-  
-  .output-panel {
-    padding: 12px;
-  }
-  
-  .editor-window {
-    border-radius: var(--radius);
-  }
-  
-  .editor-titlebar {
-    height: 34px;
-    padding: 0 10px;
-  }
-  
-  .editor-tabs {
-    height: 32px;
-  }
-  
-  .tab {
-    padding: 0 12px;
-    font-size: 12px;
-  }
-  
-  .line-number {
-    width: 36px;
-    min-width: 36px;
-    padding-right: 10px;
-    font-size: 11px;
-  }
-  
-  .line-content {
-    font-size: 12px;
-  }
-  
-  .logo-text {
-    font-size: 18px;
-  }
-  
-  .input-group textarea {
-    min-height: 150px;
-    font-size: 12px;
-  }
-  
-  /* Fullscreen adjustments */
-  .app-container.fullscreen .editor-body {
-    height: calc(100vh - 78px) !important;
-  }
-  
-  .app-container.fullscreen .line-content {
-    font-size: 12px;
-  }
-  
-  .app-container.fullscreen .line-number {
-    width: 32px;
-    min-width: 32px;
-    font-size: 10px;
-    padding-right: 8px;
-  }
+@media screen and (min-width: 1800px) {
+    .input-panel  { width: 460px; }
+    .output-panel { padding: 40px 48px; }
 }
 
-/* ---------- Very small screens (< 380px) ---------- */
+/* ---------- Tablets (< 1100px) ---------- */
+@media screen and (max-width: 1100px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .input-panel {
+        width: 100%;
+        min-width: unset;
+        max-height: none;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 18px 16px;
+    }
+
+    .toggles-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .output-panel {
+        min-height: auto;
+        padding: 20px;
+    }
+
+    .editor-window  { max-width: 100%; }
+    .editor-body    { max-height: 50vh; }
+}
+
+/* ---------- Mobile (< 768px) ---------- */
+@media screen and (max-width: 768px) {
+
+    /* Hide desktop sidebar completely */
+    .input-panel {
+        display: none !important;
+    }
+
+    /* Show mobile header */
+    .mobile-header {
+        display: flex !important;
+    }
+
+    /* Output panel takes full screen */
+    .output-panel {
+        min-height: 100vh;
+        padding: 12px 12px calc(var(--panel-header-h) + 12px);
+        align-items: flex-start;
+    }
+
+    /* Editor fills available space */
+    .editor-window {
+        max-width: 100%;
+        border-radius: var(--radius);
+    }
+
+    .editor-body {
+        max-height: calc(100vh - var(--panel-header-h) - 120px);
+    }
+
+    /* Canvas preview */
+    .canvas-preview {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .canvas-preview canvas {
+        max-height: calc(100vh - var(--panel-header-h) - 24px);
+        border-radius: var(--radius);
+    }
+
+    /* Progress in output panel */
+    .progress-container {
+        position: fixed;
+        bottom: calc(var(--panel-header-h) + 8px);
+        left: 12px;
+        right: 12px;
+        z-index: 100;
+        border-radius: 11px;
+    }
+
+    /* Title bar compact */
+    .editor-titlebar {
+        height: 34px;
+        padding: 0 10px;
+    }
+
+    .editor-tabs { height: 32px; }
+
+    .tab {
+        padding: 0 10px;
+        font-size: 11.5px;
+    }
+
+    .line-number {
+        width: 34px;
+        min-width: 34px;
+        padding-right: 8px;
+        font-size: 11px;
+    }
+
+    .line-content { font-size: 12px; }
+
+    /* Download card mobile */
+    .download-card {
+        padding: 18px;
+        max-height: 92vh;
+    }
+
+    .download-preview video { max-height: 220px; }
+
+    .download-actions {
+        flex-direction: column;
+    }
+
+    .download-actions .btn {
+        flex: unset;
+        width: 100%;
+    }
+
+    /* Minimap hidden mobile */
+    .editor-minimap { display: none !important; }
+
+    /* Shortcuts hidden mobile */
+    .shortcuts-hint { display: none; }
+}
+
+/* ---------- Small Mobile (< 480px) ---------- */
+@media screen and (max-width: 480px) {
+
+    .output-panel {
+        padding: 8px 8px calc(var(--panel-header-h) + 8px);
+    }
+
+    .editor-titlebar { height: 30px; }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .window-actions { display: none; }
+
+    .line-number {
+        width: 28px;
+        min-width: 28px;
+        padding-right: 6px;
+        font-size: 10px;
+    }
+
+    .line-content  { font-size: 11.5px; }
+
+    .mobile-header { padding: 0 10px; }
+
+    .mobile-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .mobile-btn.mobile-btn-play {
+        width: 40px;
+        height: 40px;
+    }
+
+    .drawer-content { padding: 4px 12px 20px; }
+
+    /* Drawer textarea smaller */
+    .settings-drawer .input-group textarea {
+        min-height: 120px;
+        font-size: 12px;
+    }
+}
+
+/* ---------- Very small (< 380px) ---------- */
 @media screen and (max-width: 380px) {
-  .line-number {
-    width: 28px;
-    min-width: 28px;
-    padding-right: 6px;
-    font-size: 10px;
-  }
-  
-  .line-content {
-    font-size: 11px;
-  }
-  
-  .editor-titlebar {
-    height: 30px;
-  }
-  
-  .dot {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .window-actions {
-    display: none;
-  }
+    .line-content  { font-size: 11px; }
+
+    .mobile-header-logo span.logo-text-full { display: none; }
 }
 
 /* ---------- Landscape Mobile ---------- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
-  .app-container:not(.fullscreen) {
-    flex-direction: row;
-  }
-  
-  .app-container:not(.fullscreen) .input-panel {
-    width: 320px;
-    min-width: 280px;
-    max-height: 100vh;
-    border-right: 1px solid var(--border-color);
-    border-bottom: none;
-    overflow-y: auto;
-  }
-  
-  .editor-body {
-    max-height: 60vh;
-  }
+
+    .output-panel {
+        padding: 8px 8px calc(var(--panel-header-h) + 8px);
+    }
+
+    .editor-body {
+        max-height: calc(100vh - var(--panel-header-h) - 80px);
+    }
+
+    .settings-drawer {
+        max-height: 90vh;
+    }
+
+    .mobile-header { height: 48px; }
+    :root { --panel-header-h: 48px; }
+}
+
+/* ---------- Fullscreen mobile ---------- */
+@media screen and (max-width: 768px) {
+    .app-container.fullscreen .mobile-header { display: none !important; }
+    .app-container.fullscreen .editor-body {
+        height: calc(100vh - 94px) !important;
+        max-height: none !important;
+    }
+    .app-container.fullscreen .line-content { font-size: 11px; }
+    .app-container.fullscreen .line-number {
+        width: 26px;
+        min-width: 26px;
+        font-size: 9.5px;
+        padding-right: 5px;
+    }
+}
+
+/* ---------- Canvas responsive ---------- */
+@media screen and (max-width: 1100px) {
+    .canvas-preview {
+        max-width: 100%;
+        padding: 12px;
+    }
+    .canvas-preview canvas { max-height: 70vh; }
 }

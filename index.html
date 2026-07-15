@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="tokyo-night">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CodeType Studio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,21 +12,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/themes.css">
     <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
-    <div class="app-container" id="appContainer">
 
-        <div class="input-panel" id="inputPanel">
-            <div class="logo">
-                <span class="logo-icon">⌨️</span>
-                <span class="logo-text">CodeType <span class="logo-highlight">Studio</span></span>
-            </div>
+<div class="app-container" id="appContainer">
 
-            <div class="input-group">
+    <!-- ========================================
+         DESKTOP INPUT PANEL
+         ======================================== -->
+    <div class="input-panel" id="inputPanel">
+
+        <div class="logo">
+            <span class="logo-icon">⌨️</span>
+            <span class="logo-text">CodeType <span class="logo-highlight">Studio</span></span>
+        </div>
+
+        <!-- Code Input -->
+        <div class="input-group">
+            <div class="label-row">
                 <label for="codeInput">Your Code</label>
-                <textarea id="codeInput" placeholder="Paste your code here..." spellcheck="false">function greet(name) {
+                <div class="label-actions">
+                    <button class="icon-btn" id="btnImportFile" title="Import file (Ctrl+O)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Import
+                    </button>
+                    <button class="icon-btn" id="btnClearCode" title="Clear code">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <textarea id="codeInput" placeholder="Paste your code here or import a file..." spellcheck="false">function greet(name) {
     const message = `Hello, ${name}!`;
     console.log(message);
 
@@ -41,212 +68,763 @@
 // Call the function
 const result = greet("World");
 console.log(result);</textarea>
+            <div class="code-meta">
+                <span id="charCount">0 chars</span>
+                <span id="lineCount">0 lines</span>
+                <span id="estimatedTime">~0s</span>
             </div>
+        </div>
 
-            <div class="settings-row">
-                <div class="input-group half">
-                    <label for="languageSelect">Language</label>
-                    <select id="languageSelect">
+        <!-- Language & File Name -->
+        <div class="settings-row">
+            <div class="input-group half">
+                <label for="languageSelect">Language</label>
+                <select id="languageSelect">
+                    <optgroup label="Web">
                         <option value="javascript" selected>JavaScript</option>
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                        <option value="cpp">C++</option>
-                        <option value="c">C</option>
-                        <option value="csharp">C#</option>
                         <option value="typescript">TypeScript</option>
                         <option value="html">HTML</option>
                         <option value="css">CSS</option>
                         <option value="php">PHP</option>
-                        <option value="ruby">Ruby</option>
-                        <option value="go">Go</option>
+                    </optgroup>
+                    <optgroup label="Systems">
+                        <option value="c">C</option>
+                        <option value="cpp">C++</option>
                         <option value="rust">Rust</option>
-                        <option value="swift">Swift</option>
+                        <option value="go">Go</option>
+                    </optgroup>
+                    <optgroup label="JVM">
+                        <option value="java">Java</option>
                         <option value="kotlin">Kotlin</option>
-                        <option value="dart">Dart</option>
-                        <option value="sql">SQL</option>
+                    </optgroup>
+                    <optgroup label="Scripting">
+                        <option value="python">Python</option>
+                        <option value="ruby">Ruby</option>
                         <option value="bash">Bash</option>
+                    </optgroup>
+                    <optgroup label="Mobile">
+                        <option value="swift">Swift</option>
+                        <option value="dart">Dart</option>
+                    </optgroup>
+                    <optgroup label="Other">
+                        <option value="csharp">C#</option>
+                        <option value="sql">SQL</option>
                         <option value="json">JSON</option>
                         <option value="xml">XML</option>
                         <option value="yaml">YAML</option>
                         <option value="markdown">Markdown</option>
-                    </select>
-                </div>
-
-                <div class="input-group half">
-                    <label for="fileNameInput">File Name</label>
-                    <input type="text" id="fileNameInput" value="index.js" placeholder="main.py">
-                </div>
+                        <option value="scss">SCSS</option>
+                        <option value="graphql">GraphQL</option>
+                        <option value="lua">Lua</option>
+                        <option value="plaintext">Plain Text</option>
+                    </optgroup>
+                </select>
             </div>
-
-            <div class="input-group">
-                <label for="speedSlider">Typing Speed: <span id="speedValue">40</span> chars/sec</label>
-                <input type="range" id="speedSlider" min="5" max="200" value="40" step="1">
-                <div class="speed-labels"><span>🐢 Slow</span><span>🐇 Fast</span></div>
-            </div>
-
-            <div class="input-group">
-                <label for="newlineDelay">Newline Pause: <span id="newlineDelayValue">300</span> ms</label>
-                <input type="range" id="newlineDelay" min="0" max="1000" value="300" step="50">
-                <div class="speed-labels"><span>None</span><span>Long</span></div>
-            </div>
-
-            <div class="input-group toggle-group">
-                <label class="toggle-label">
-                    <input type="checkbox" id="humanizeToggle" checked>
-                    <span class="toggle-switch"></span>
-                    <span>Humanized Typing</span>
-                </label>
-            </div>
-
-            <div class="input-group toggle-group">
-                <label class="toggle-label">
-                    <input type="checkbox" id="soundToggle">
-                    <span class="toggle-switch"></span>
-                    <span>Keyboard Sound 🔊</span>
-                </label>
-            </div>
-
-            <div class="section-divider"><span>Recording</span></div>
-
-            <div class="settings-row" id="formatRow">
-                <div class="input-group half">
-                    <label for="formatSelect">Format</label>
-                    <select id="formatSelect">
-                        <option value="webm">WebM</option>
-                        <option value="mp4">MP4</option>
-                    </select>
-                </div>
-
-                <div class="input-group half">
-                    <label for="qualitySelect">Quality</label>
-                    <select id="qualitySelect">
-                        <option value="1080p">Full HD</option>
-                        <option value="2k">2K</option>
-                        <option value="4k">4K Ultra HD</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="info-message" id="formatInfo" style="display:none;"></div>
-            <div class="warning-message" id="qualityWarning" style="display:none;"></div>
-
-            <div class="input-group">
-                <label for="endBufferSlider">End Buffer: <span id="endBufferValue">2</span>s</label>
-                <input type="range" id="endBufferSlider" min="0" max="5" value="2" step="0.5">
-            </div>
-
-            <div class="control-buttons">
-                <button class="btn btn-play" id="btnPlay">
-                    <span class="btn-icon" id="playIcon">▶</span>
-                    <span id="playText">Play</span>
-                </button>
-
-                <button class="btn btn-record" id="btnRecord">
-                    <span class="btn-icon" id="recordIcon">⏺</span>
-                    <span id="recordText">Record</span>
-                </button>
-
-                <button class="btn btn-reset" id="btnReset">
-                    <span class="btn-icon">⟲</span>
-                    <span>Reset</span>
-                </button>
-            </div>
-
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar"></div>
-                <span class="progress-text" id="progressText">0%</span>
+            <div class="input-group half">
+                <label for="fileNameInput">File Name</label>
+                <input type="text" id="fileNameInput" value="index.js" placeholder="main.py">
             </div>
         </div>
 
-        <div class="output-panel" id="outputPanel">
-            <div class="editor-window" id="editorWindow">
-                <div class="editor-titlebar">
-                    <div class="window-dots">
-                        <span class="dot dot-red"></span>
-                        <span class="dot dot-yellow"></span>
-                        <span class="dot dot-green"></span>
-                    </div>
-                    <div class="window-title" id="windowTitle">CodeType Studio</div>
-                    <div class="window-actions">
-                        <span class="win-btn">─</span>
-                        <span class="win-btn">□</span>
-                        <span class="win-btn">×</span>
-                    </div>
-                </div>
+        <!-- Appearance -->
+        <div class="section-divider"><span>Appearance</span></div>
 
-                <div class="editor-tabs">
-                    <div class="tab active" id="editorTab">
-                        <span class="tab-icon" id="tabIcon">📄</span>
-                        <span class="tab-name" id="tabName">index.js</span>
-                        <span class="tab-close">×</span>
-                    </div>
-                </div>
+        <div class="input-group">
+            <label for="themeSelect">Editor Theme</label>
+            <select id="themeSelect">
+                <option value="tokyo-night">Tokyo Night 🌙</option>
+                <option value="dracula">Dracula 🧛</option>
+                <option value="github-dark">GitHub Dark 🐙</option>
+                <option value="monokai">Monokai 🎨</option>
+                <option value="nord">Nord ❄️</option>
+                <option value="solarized-dark">Solarized Dark ☀️</option>
+                <option value="one-dark">One Dark Pro 🌑</option>
+                <option value="catppuccin">Catppuccin Mocha 🐱</option>
+            </select>
+        </div>
 
+        <div class="input-group">
+            <label for="backgroundSelect">Video Background</label>
+            <select id="backgroundSelect">
+                <option value="solid-black">⬛ Solid Black</option>
+                <option value="solid-dark">🌑 Solid Dark</option>
+                <option value="gradient-blue">🌊 Gradient — Ocean</option>
+                <option value="gradient-purple">🌌 Gradient — Galaxy</option>
+                <option value="gradient-green">🌿 Gradient — Forest</option>
+                <option value="gradient-sunset">🌅 Gradient — Sunset</option>
+                <option value="gradient-midnight">🌃 Gradient — Midnight</option>
+                <option value="mesh-dark">✨ Mesh — Dark</option>
+                <option value="mesh-purple">💜 Mesh — Purple</option>
+                <option value="dots-dark">⚫ Dot Grid — Dark</option>
+                <option value="custom-color">🎨 Custom Color...</option>
+            </select>
+        </div>
+
+        <div class="input-group" id="customBgGroup" style="display:none;">
+            <label for="customBgColor">Custom Background Color</label>
+            <div class="color-input-row">
+                <input type="color" id="customBgColor" value="#000000">
+                <input type="text"  id="customBgHex"   value="#000000" placeholder="#000000" maxlength="7">
+            </div>
+        </div>
+
+        <div class="settings-row">
+            <div class="input-group half">
+                <label for="cursorStyleSelect">Cursor Style</label>
+                <select id="cursorStyleSelect">
+                    <option value="line">Line  |</option>
+                    <option value="block">Block █</option>
+                    <option value="underline">Under _</option>
+                </select>
+            </div>
+            <div class="input-group half">
+                <label for="fontSizeSelect">Font Size</label>
+                <select id="fontSizeSelect">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                    <option value="xlarge">X-Large</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Typing -->
+        <div class="section-divider"><span>Typing</span></div>
+
+        <div class="input-group">
+            <label for="speedSlider">
+                Speed: <span id="speedValue">40</span> chars/sec
+                <span class="label-hint" id="speedHint">👆 Medium</span>
+            </label>
+            <input type="range" id="speedSlider" min="1" max="200" value="40" step="1">
+            <div class="speed-labels"><span>🐢 1</span><span>🔥 200</span></div>
+        </div>
+
+        <div class="input-group">
+            <label for="newlineDelay">
+                Newline Pause: <span id="newlineDelayValue">300</span> ms
+            </label>
+            <input type="range" id="newlineDelay" min="0" max="1000" value="300" step="50">
+            <div class="speed-labels"><span>None</span><span>Long</span></div>
+        </div>
+
+        <div class="toggles-grid">
+            <label class="toggle-label">
+                <input type="checkbox" id="humanizeToggle" checked>
+                <span class="toggle-switch"></span>
+                <span>Humanized</span>
+            </label>
+            <label class="toggle-label">
+                <input type="checkbox" id="mistakeToggle">
+                <span class="toggle-switch"></span>
+                <span>Typos</span>
+            </label>
+            <label class="toggle-label">
+                <input type="checkbox" id="soundToggle">
+                <span class="toggle-switch"></span>
+                <span>Sound 🔊</span>
+            </label>
+            <label class="toggle-label">
+                <input type="checkbox" id="minimapToggle">
+                <span class="toggle-switch"></span>
+                <span>Minimap</span>
+            </label>
+        </div>
+
+        <!-- Recording -->
+        <div class="section-divider"><span>Recording</span></div>
+
+        <div class="settings-row">
+            <div class="input-group half">
+                <label for="aspectSelect">Ratio</label>
+                <select id="aspectSelect">
+                    <option value="portrait-9-16">9:16 TikTok</option>
+                    <option value="landscape-16-9">16:9 YouTube</option>
+                    <option value="square-1-1">1:1 Instagram</option>
+                    <option value="portrait-4-5">4:5 IG Post</option>
+                    <option value="landscape-4-3">4:3 Classic</option>
+                </select>
+            </div>
+            <div class="input-group half">
+                <label for="qualitySelect">Quality</label>
+                <select id="qualitySelect">
+                    <option value="1080p">Full HD</option>
+                    <option value="2k">2K</option>
+                    <option value="4k">4K</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group" id="formatRow">
+            <label for="formatSelect">Format</label>
+            <select id="formatSelect">
+                <option value="webm">WebM</option>
+                <option value="mp4">MP4</option>
+            </select>
+        </div>
+
+        <div class="info-message"    id="formatInfo"     style="display:none;"></div>
+        <div class="warning-message" id="qualityWarning" style="display:none;"></div>
+
+        <div class="input-group">
+            <label for="endBufferSlider">End Buffer: <span id="endBufferValue">2</span>s</label>
+            <input type="range" id="endBufferSlider" min="0" max="5" value="2" step="0.5">
+        </div>
+
+        <!-- Branding -->
+        <div class="section-divider"><span>Branding</span></div>
+
+        <div class="input-group">
+            <label for="watermarkInput">Watermark</label>
+            <input type="text" id="watermarkInput" placeholder="@yourhandle">
+        </div>
+
+        <div class="settings-row">
+            <div class="input-group half">
+                <label for="watermarkPos">Position</label>
+                <select id="watermarkPos">
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                </select>
+            </div>
+            <div class="input-group half">
+                <label for="watermarkOpacity">Opacity: <span id="watermarkOpacityValue">60</span>%</label>
+                <input type="range" id="watermarkOpacity" min="10" max="100" value="60" step="5">
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="section-divider"><span>Controls</span></div>
+
+        <div class="control-buttons">
+            <button class="btn btn-play"   id="btnPlay"   title="Play / Pause (Space)">
+                <span class="btn-icon" id="playIcon">▶</span>
+                <span id="playText">Play</span>
+            </button>
+            <button class="btn btn-record" id="btnRecord" title="Record (R)">
+                <span class="btn-icon" id="recordIcon">⏺</span>
+                <span id="recordText">Record</span>
+            </button>
+            <button class="btn btn-reset"  id="btnReset"  title="Reset (Escape)">
+                <span class="btn-icon">⟲</span>
+                <span>Reset</span>
+            </button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar"  id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+        </div>
+
+        <div class="shortcuts-hint">
+            <span>⌨️ Shortcuts:</span>
+            <span><kbd>Space</kbd> Play</span>
+            <span><kbd>R</kbd> Record</span>
+            <span><kbd>Esc</kbd> Reset</span>
+            <span><kbd>↑↓</kbd> Speed</span>
+            <span><kbd>F</kbd> Fullscreen</span>
+        </div>
+
+    </div>
+    <!-- END DESKTOP INPUT PANEL -->
+
+
+    <!-- ========================================
+         OUTPUT PANEL
+         ======================================== -->
+    <div class="output-panel" id="outputPanel">
+
+        <div class="editor-window" id="editorWindow" data-theme="tokyo-night">
+            <div class="editor-titlebar">
+                <div class="window-dots">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                </div>
+                <div class="window-title" id="windowTitle">CodeType Studio</div>
+                <div class="window-actions">
+                    <span class="win-btn">─</span>
+                    <span class="win-btn">□</span>
+                    <span class="win-btn">×</span>
+                </div>
+            </div>
+
+            <div class="editor-tabs">
+                <div class="tab active" id="editorTab">
+                    <span class="tab-icon" id="tabIcon">📄</span>
+                    <span class="tab-name" id="tabName">index.js</span>
+                    <span class="tab-close">×</span>
+                </div>
+            </div>
+
+            <div class="editor-main">
                 <div class="editor-body" id="editorBody">
                     <div class="code-area" id="codeArea">
                         <div class="code-line" data-line="1">
                             <span class="line-number">1</span>
-                            <span class="line-content"><span class="cursor blink">█</span></span>
+                            <span class="line-content">
+                                <span class="cursor blink">|</span>
+                            </span>
                         </div>
                     </div>
                 </div>
-
-                <div class="editor-statusbar">
-                    <div class="status-left">
-                        <span class="status-item" id="statusLanguage">JavaScript</span>
-                        <span class="status-item">UTF-8</span>
-                    </div>
-                    <div class="status-right">
-                        <span class="status-item" id="statusPosition">Ln 1, Col 1</span>
-                        <span class="status-item">Spaces: 4</span>
-                    </div>
+                <div class="editor-minimap" id="editorMinimap" style="display:none;">
+                    <canvas id="minimapCanvas"></canvas>
                 </div>
             </div>
 
-            <div class="canvas-preview" id="canvasPreview"></div>
-
-            <div class="recording-indicator" id="recordingIndicator">
-                <span class="rec-dot"></span>
-                <span class="rec-label">REC</span>
-                <span class="rec-timer" id="recTimer">00:00</span>
+            <div class="editor-statusbar">
+                <div class="status-left">
+                    <span class="status-item status-branch">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6" y1="3" x2="6" y2="15"/>
+                            <circle cx="18" cy="6" r="3"/>
+                            <circle cx="6" cy="18" r="3"/>
+                            <path d="M18 9a9 9 0 01-9 9"/>
+                        </svg>
+                        main
+                    </span>
+                    <span class="status-item" id="statusLanguage">JavaScript</span>
+                    <span class="status-item">UTF-8</span>
+                </div>
+                <div class="status-right">
+                    <span class="status-item" id="statusPosition">Ln 1, Col 1</span>
+                    <span class="status-item">Spaces: 4</span>
+                    <span class="status-item" id="statusLines">0 lines</span>
+                </div>
             </div>
+        </div>
+
+        <div class="canvas-preview" id="canvasPreview"></div>
+
+        <div class="recording-indicator" id="recordingIndicator">
+            <span class="rec-dot"></span>
+            <span class="rec-label">REC</span>
+            <span class="rec-timer" id="recTimer">00:00</span>
+        </div>
+
+        <button class="btn-exit-fullscreen" id="btnExitFullscreen">✕ Exit Fullscreen</button>
+
+    </div>
+    <!-- END OUTPUT PANEL -->
+
+</div>
+<!-- END APP CONTAINER -->
+
+
+<!-- ========================================
+     MOBILE HEADER (fixed bottom bar)
+     ======================================== -->
+<div class="mobile-header" id="mobileHeader">
+
+    <div class="mobile-header-logo">
+        <span>⌨️</span>
+        <span class="logo-text">Code<span class="logo-highlight">Type</span></span>
+    </div>
+
+    <div class="mobile-controls">
+        <!-- Play -->
+        <button class="mobile-btn mobile-btn-play" id="mobileBtnPlay" title="Play">
+            <span id="mobilePlayIcon">▶</span>
+        </button>
+
+        <!-- Record -->
+        <button class="mobile-btn mobile-btn-record" id="mobileBtnRecord" title="Record">
+            <span id="mobileRecordIcon">⏺</span>
+        </button>
+
+        <!-- Reset -->
+        <button class="mobile-btn" id="mobileBtnReset" title="Reset">⟲</button>
+
+        <!-- Settings hamburger -->
+        <button class="mobile-btn mobile-btn-settings" id="mobileBtnSettings" title="Settings">
+            <div class="hamburger" id="hamburgerIcon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+    </div>
+
+</div>
+
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- ========================================
+     SETTINGS DRAWER (mobile bottom sheet)
+     ======================================== -->
+<div class="settings-drawer" id="settingsDrawer">
+
+    <div class="drawer-handle">
+        <div class="drawer-handle-bar"></div>
+    </div>
+
+    <!-- Section Tabs -->
+    <div style="padding: 0 16px;">
+        <div class="drawer-tabs" id="drawerTabs">
+            <button class="drawer-tab active" data-section="code">📝 Code</button>
+            <button class="drawer-tab" data-section="appearance">🎨 Look</button>
+            <button class="drawer-tab" data-section="typing">⌨️ Typing</button>
+            <button class="drawer-tab" data-section="recording">🎬 Record</button>
+            <button class="drawer-tab" data-section="branding">✍️ Brand</button>
         </div>
     </div>
 
-    <div class="download-overlay" id="downloadOverlay">
-        <div class="download-card">
-            <div class="download-header">
-                <span class="download-icon">🎬</span>
+    <div class="drawer-content">
+
+        <!-- === CODE SECTION === -->
+        <div class="drawer-section active" id="section-code">
+
+            <div class="input-group">
+                <div class="label-row">
+                    <label for="mobileCodeInput">Your Code</label>
+                    <div class="label-actions">
+                        <button class="icon-btn" id="mobileBtnImport">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Import
+                        </button>
+                        <button class="icon-btn" id="mobileBtnClear">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <textarea id="mobileCodeInput"
+                    placeholder="Paste your code here or import a file..."
+                    spellcheck="false"
+                    rows="8"></textarea>
+                <div class="code-meta">
+                    <span id="mobileCharCount">0 chars</span>
+                    <span id="mobileLineCount">0 lines</span>
+                    <span id="mobileEstTime">~0s</span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="input-group half">
+                    <label for="mobileLanguageSelect">Language</label>
+                    <select id="mobileLanguageSelect">
+                        <optgroup label="Web">
+                            <option value="javascript" selected>JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="php">PHP</option>
+                        </optgroup>
+                        <optgroup label="Systems">
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="rust">Rust</option>
+                            <option value="go">Go</option>
+                        </optgroup>
+                        <optgroup label="JVM">
+                            <option value="java">Java</option>
+                            <option value="kotlin">Kotlin</option>
+                        </optgroup>
+                        <optgroup label="Scripting">
+                            <option value="python">Python</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="bash">Bash</option>
+                        </optgroup>
+                        <optgroup label="Mobile">
+                            <option value="swift">Swift</option>
+                            <option value="dart">Dart</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                            <option value="csharp">C#</option>
+                            <option value="sql">SQL</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="yaml">YAML</option>
+                            <option value="markdown">Markdown</option>
+                            <option value="scss">SCSS</option>
+                            <option value="graphql">GraphQL</option>
+                            <option value="lua">Lua</option>
+                            <option value="plaintext">Plain Text</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="input-group half">
+                    <label for="mobileFileNameInput">File Name</label>
+                    <input type="text" id="mobileFileNameInput" value="index.js" placeholder="main.py">
+                </div>
+            </div>
+
+            <!-- Mobile progress bar -->
+            <div class="progress-container active" id="mobileProgressContainer" style="display:none;">
+                <div class="progress-bar"  id="mobileProgressBar"></div>
+                <span class="progress-text" id="mobileProgressText">0%</span>
+            </div>
+
+        </div>
+        <!-- END CODE SECTION -->
+
+        <!-- === APPEARANCE SECTION === -->
+        <div class="drawer-section" id="section-appearance">
+
+            <div class="input-group">
+                <label for="mobileThemeSelect">Editor Theme</label>
+                <select id="mobileThemeSelect">
+                    <option value="tokyo-night">Tokyo Night 🌙</option>
+                    <option value="dracula">Dracula 🧛</option>
+                    <option value="github-dark">GitHub Dark 🐙</option>
+                    <option value="monokai">Monokai 🎨</option>
+                    <option value="nord">Nord ❄️</option>
+                    <option value="solarized-dark">Solarized Dark ☀️</option>
+                    <option value="one-dark">One Dark Pro 🌑</option>
+                    <option value="catppuccin">Catppuccin Mocha 🐱</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="mobileBackgroundSelect">Video Background</label>
+                <select id="mobileBackgroundSelect">
+                    <option value="solid-black">⬛ Solid Black</option>
+                    <option value="solid-dark">🌑 Solid Dark</option>
+                    <option value="gradient-blue">🌊 Ocean</option>
+                    <option value="gradient-purple">🌌 Galaxy</option>
+                    <option value="gradient-green">🌿 Forest</option>
+                    <option value="gradient-sunset">🌅 Sunset</option>
+                    <option value="gradient-midnight">🌃 Midnight</option>
+                    <option value="mesh-dark">✨ Mesh Dark</option>
+                    <option value="mesh-purple">💜 Mesh Purple</option>
+                    <option value="dots-dark">⚫ Dot Grid</option>
+                    <option value="custom-color">🎨 Custom...</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="mobileCustomBgGroup" style="display:none;">
+                <label>Custom Color</label>
+                <div class="color-input-row">
+                    <input type="color" id="mobileCustomBgColor" value="#000000">
+                    <input type="text"  id="mobileCustomBgHex"   value="#000000" maxlength="7">
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="input-group half">
+                    <label for="mobileCursorStyleSelect">Cursor</label>
+                    <select id="mobileCursorStyleSelect">
+                        <option value="line">Line |</option>
+                        <option value="block">Block █</option>
+                        <option value="underline">Under _</option>
+                    </select>
+                </div>
+                <div class="input-group half">
+                    <label for="mobileFontSizeSelect">Font Size</label>
+                    <select id="mobileFontSizeSelect">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                        <option value="xlarge">X-Large</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+        <!-- END APPEARANCE SECTION -->
+
+        <!-- === TYPING SECTION === -->
+        <div class="drawer-section" id="section-typing">
+
+            <div class="input-group">
+                <label for="mobileSpeedSlider">
+                    Speed: <span id="mobileSpeedValue">40</span> chars/sec
+                    <span class="label-hint" id="mobileSpeedHint">👆 Medium</span>
+                </label>
+                <input type="range" id="mobileSpeedSlider" min="1" max="200" value="40" step="1">
+                <div class="speed-labels"><span>🐢 1</span><span>🔥 200</span></div>
+            </div>
+
+            <div class="input-group">
+                <label for="mobileNewlineDelay">
+                    Newline Pause: <span id="mobileNlValue">300</span> ms
+                </label>
+                <input type="range" id="mobileNewlineDelay" min="0" max="1000" value="300" step="50">
+                <div class="speed-labels"><span>None</span><span>Long</span></div>
+            </div>
+
+            <div class="toggles-grid">
+                <label class="toggle-label">
+                    <input type="checkbox" id="mobileHumanizeToggle" checked>
+                    <span class="toggle-switch"></span>
+                    <span>Humanized</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="mobileMistakeToggle">
+                    <span class="toggle-switch"></span>
+                    <span>Typos</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="mobileSoundToggle">
+                    <span class="toggle-switch"></span>
+                    <span>Sound 🔊</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="mobileMinimapToggle">
+                    <span class="toggle-switch"></span>
+                    <span>Minimap</span>
+                </label>
+            </div>
+
+        </div>
+        <!-- END TYPING SECTION -->
+
+        <!-- === RECORDING SECTION === -->
+        <div class="drawer-section" id="section-recording">
+
+            <div class="settings-row">
+                <div class="input-group half">
+                    <label for="mobileAspectSelect">Ratio</label>
+                    <select id="mobileAspectSelect">
+                        <option value="portrait-9-16">9:16 TikTok</option>
+                        <option value="landscape-16-9">16:9 YouTube</option>
+                        <option value="square-1-1">1:1 Instagram</option>
+                        <option value="portrait-4-5">4:5 IG Post</option>
+                        <option value="landscape-4-3">4:3 Classic</option>
+                    </select>
+                </div>
+                <div class="input-group half">
+                    <label for="mobileQualitySelect">Quality</label>
+                    <select id="mobileQualitySelect">
+                        <option value="1080p">Full HD</option>
+                        <option value="2k">2K</option>
+                        <option value="4k">4K</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="mobileFormatSelect">Format</label>
+                <select id="mobileFormatSelect">
+                    <option value="webm">WebM</option>
+                    <option value="mp4">MP4</option>
+                </select>
+            </div>
+
+            <div class="info-message"    id="mobileFormatInfo"     style="display:none;"></div>
+            <div class="warning-message" id="mobileQualityWarning" style="display:none;"></div>
+
+            <div class="input-group">
+                <label for="mobileEndBufferSlider">
+                    End Buffer: <span id="mobileEndBufferValue">2</span>s
+                </label>
+                <input type="range" id="mobileEndBufferSlider" min="0" max="5" value="2" step="0.5">
+            </div>
+
+        </div>
+        <!-- END RECORDING SECTION -->
+
+        <!-- === BRANDING SECTION === -->
+        <div class="drawer-section" id="section-branding">
+
+            <div class="input-group">
+                <label for="mobileWatermarkInput">Watermark Text</label>
+                <input type="text" id="mobileWatermarkInput" placeholder="@yourhandle">
+            </div>
+
+            <div class="settings-row">
+                <div class="input-group half">
+                    <label for="mobileWatermarkPos">Position</label>
+                    <select id="mobileWatermarkPos">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                    </select>
+                </div>
+                <div class="input-group half">
+                    <label for="mobileWatermarkOpacity">
+                        Opacity: <span id="mobileWatermarkOpacityValue">60</span>%
+                    </label>
+                    <input type="range" id="mobileWatermarkOpacity" min="10" max="100" value="60" step="5">
+                </div>
+            </div>
+
+        </div>
+        <!-- END BRANDING SECTION -->
+
+    </div>
+    <!-- END DRAWER CONTENT -->
+</div>
+<!-- END SETTINGS DRAWER -->
+
+
+<!-- ========================================
+     DOWNLOAD OVERLAY
+     ======================================== -->
+<div class="download-overlay" id="downloadOverlay">
+    <div class="download-card">
+        <div class="download-header">
+            <span class="download-icon">🎬</span>
+            <div>
                 <h2>Recording Complete!</h2>
-            </div>
-
-            <div class="download-preview">
-                <video id="previewVideo" controls playsinline></video>
-            </div>
-
-            <div class="download-info">
-                <span id="downloadSize">—</span>
-                <span id="downloadDuration">—</span>
-                <span id="downloadResolution">—</span>
-                <span id="downloadFormat">—</span>
-            </div>
-
-            <div class="download-actions">
-                <button class="btn btn-download" id="btnDownload">
-                    <span class="btn-icon">⬇</span>
-                    <span>Download Video</span>
-                </button>
-                <button class="btn btn-close-overlay" id="btnCloseOverlay">
-                    <span>Close</span>
-                </button>
+                <p class="download-subtitle">Your video is ready to download</p>
             </div>
         </div>
-    </div>
 
-    <script src="js/highlight-parser.js"></script>
-    <script src="js/editor-ui.js"></script>
-    <script src="js/typing-engine.js"></script>
-    <script src="js/recorder.js"></script>
-    <script src="js/app.js"></script>
+        <div class="download-preview">
+            <video id="previewVideo" controls playsinline></video>
+        </div>
+
+        <div class="download-info">
+            <div class="info-chip">
+                <span class="chip-label">Size</span>
+                <span class="chip-value" id="downloadSize">—</span>
+            </div>
+            <div class="info-chip">
+                <span class="chip-label">Duration</span>
+                <span class="chip-value" id="downloadDuration">—</span>
+            </div>
+            <div class="info-chip">
+                <span class="chip-label">Resolution</span>
+                <span class="chip-value" id="downloadResolution">—</span>
+            </div>
+            <div class="info-chip">
+                <span class="chip-label">Format</span>
+                <span class="chip-value" id="downloadFormat">—</span>
+            </div>
+        </div>
+
+        <div class="download-actions">
+            <button class="btn btn-download" id="btnDownload">
+                <span class="btn-icon">⬇</span>
+                <span>Download Video</span>
+            </button>
+            <button class="btn btn-share" id="btnCopyLink">
+                <span class="btn-icon">🔗</span>
+                <span>Copy Link</span>
+            </button>
+            <button class="btn btn-close-overlay" id="btnCloseOverlay">
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden file input -->
+<input type="file" id="fileImportInput"
+    accept=".js,.ts,.jsx,.tsx,.py,.java,.cpp,.cc,.cxx,.c,.cs,.go,.rs,.swift,.kt,.kts,.dart,.php,.rb,.sql,.sh,.bash,.zsh,.ps1,.json,.xml,.yml,.yaml,.md,.markdown,.html,.htm,.css,.scss,.sass,.less,.vue,.svelte,.lua,.pl,.r,.tf,.toml,.ini,.env,.txt,.svg,.graphql,.proto,.csv"
+    style="display:none;">
+
+<!-- Scripts -->
+<script src="js/themes.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/highlight-parser.js"></script>
+<script src="js/editor-ui.js"></script>
+<script src="js/typing-engine.js"></script>
+<script src="js/recorder.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>
