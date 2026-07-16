@@ -220,13 +220,13 @@
         updateCodeMeta();
 
         if (!Recorder.isSupported()) {
-            if (btnRecord)   { btnRecord.disabled   = true; btnRecord.style.opacity   = '0.4'; }
+            if (btnRecord)       { btnRecord.disabled       = true; btnRecord.style.opacity       = '0.4'; }
             if (mobileBtnRecord) { mobileBtnRecord.disabled = true; mobileBtnRecord.style.opacity = '0.4'; }
         }
 
-        EditorUI.setTheme(themeSelect ? themeSelect.value : 'tokyo-night');
+        EditorUI.setTheme(themeSelect       ? themeSelect.value       : 'tokyo-night');
         EditorUI.setCursorStyle(cursorStyleSelect ? cursorStyleSelect.value : 'line');
-        EditorUI.setFontSize(fontSizeSelect ? fontSizeSelect.value : 'medium');
+        EditorUI.setFontSize(fontSizeSelect  ? fontSizeSelect.value    : 'medium');
     }
 
     // ============================================================
@@ -331,9 +331,9 @@
                 const v = parseInt(speedSlider.value, 10);
                 if (speedValue) speedValue.textContent = v;
                 if (speedHint)  speedHint.textContent  = getSpeedHint(v);
-                if (mobileSpeedSlider) mobileSpeedSlider.value = v;
-                if (mobileSpeedValue)  mobileSpeedValue.textContent = v;
-                if (mobileSpeedHint)   mobileSpeedHint.textContent  = getSpeedHint(v);
+                if (mobileSpeedSlider) mobileSpeedSlider.value       = v;
+                if (mobileSpeedValue)  mobileSpeedValue.textContent  = v;
+                if (mobileSpeedHint)   mobileSpeedHint.textContent   = getSpeedHint(v);
                 TypingEngine.configure({ speed: v });
                 updateCodeMeta();
                 saveSettings();
@@ -344,7 +344,7 @@
             nlSlider.addEventListener('input', () => {
                 const v = parseInt(nlSlider.value, 10);
                 if (nlValue) nlValue.textContent = v;
-                if (mobileNlSlider) mobileNlSlider.value = v;
+                if (mobileNlSlider) mobileNlSlider.value      = v;
                 if (mobileNlValue)  mobileNlValue.textContent = v;
                 TypingEngine.configure({ newlineDelay: v });
                 saveSettings();
@@ -458,7 +458,7 @@
         if (bufSlider) {
             bufSlider.addEventListener('input', () => {
                 if (bufValue) bufValue.textContent = bufSlider.value;
-                if (mobileEndBufSlider) mobileEndBufSlider.value = bufSlider.value;
+                if (mobileEndBufSlider) mobileEndBufSlider.value      = bufSlider.value;
                 if (mobileEndBufValue)  mobileEndBufValue.textContent = bufSlider.value;
                 saveSettings();
             });
@@ -660,7 +660,7 @@
             mobileEndBufSlider.addEventListener('input', () => {
                 if (mobileEndBufValue)
                     mobileEndBufValue.textContent = mobileEndBufSlider.value;
-                if (bufSlider) bufSlider.value = mobileEndBufSlider.value;
+                if (bufSlider) bufSlider.value      = mobileEndBufSlider.value;
                 if (bufValue)  bufValue.textContent = mobileEndBufSlider.value;
                 saveSettings();
             });
@@ -726,17 +726,17 @@
 
     function openDrawer() {
         drawerOpen = true;
-        if (settingsDrawer)  settingsDrawer.classList.add('open');
-        if (drawerOverlay)   drawerOverlay.classList.add('active');
-        if (hamburgerIcon)   hamburgerIcon.classList.add('open');
+        if (settingsDrawer) settingsDrawer.classList.add('open');
+        if (drawerOverlay)  drawerOverlay.classList.add('active');
+        if (hamburgerIcon)  hamburgerIcon.classList.add('open');
         syncMobileFromDesktop();
     }
 
     function closeDrawer() {
         drawerOpen = false;
-        if (settingsDrawer)  settingsDrawer.classList.remove('open');
-        if (drawerOverlay)   drawerOverlay.classList.remove('active');
-        if (hamburgerIcon)   hamburgerIcon.classList.remove('open');
+        if (settingsDrawer) settingsDrawer.classList.remove('open');
+        if (drawerOverlay)  drawerOverlay.classList.remove('active');
+        if (hamburgerIcon)  hamburgerIcon.classList.remove('open');
     }
 
     function switchDrawerSection(sectionId) {
@@ -761,12 +761,12 @@
         if (mFile && fileNameInput) mFile.value = fileNameInput.value;
 
         const spd = speedSlider ? speedSlider.value : '40';
-        if (mobileSpeedSlider) mobileSpeedSlider.value  = spd;
-        if (mobileSpeedValue)  mobileSpeedValue.textContent = spd;
-        if (mobileSpeedHint)   mobileSpeedHint.textContent  = getSpeedHint(+spd);
+        if (mobileSpeedSlider) mobileSpeedSlider.value       = spd;
+        if (mobileSpeedValue)  mobileSpeedValue.textContent  = spd;
+        if (mobileSpeedHint)   mobileSpeedHint.textContent   = getSpeedHint(+spd);
 
         const nl = nlSlider ? nlSlider.value : '300';
-        if (mobileNlSlider) mobileNlSlider.value  = nl;
+        if (mobileNlSlider) mobileNlSlider.value      = nl;
         if (mobileNlValue)  mobileNlValue.textContent = nl;
 
         if ($d('mobileHumanizeToggle') && humanizeToggle)
@@ -795,7 +795,7 @@
             $d('mobileFormatSelect').value = formatSelect.value;
 
         const buf = bufSlider ? bufSlider.value : '2';
-        if (mobileEndBufSlider) mobileEndBufSlider.value = buf;
+        if (mobileEndBufSlider) mobileEndBufSlider.value      = buf;
         if (mobileEndBufValue)  mobileEndBufValue.textContent = buf;
 
         if ($d('mobileWatermarkInput') && watermarkInput)
@@ -804,8 +804,8 @@
             $d('mobileWatermarkPos').value = watermarkPos.value;
 
         const op = watermarkOpacity ? watermarkOpacity.value : '60';
-        if (mobileWatermarkOpacity) mobileWatermarkOpacity.value = op;
-        if (mobileWatermarkOpVal)   mobileWatermarkOpVal.textContent = op;
+        if (mobileWatermarkOpacity) mobileWatermarkOpacity.value      = op;
+        if (mobileWatermarkOpVal)   mobileWatermarkOpVal.textContent  = op;
 
         updateCodeMeta();
     }
@@ -825,7 +825,7 @@
                 return;
             }
 
-            if (['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
 
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key.toLowerCase()) {
@@ -844,7 +844,7 @@
             }
 
             switch (e.key) {
-                case ' ':        e.preventDefault(); onPlay();   break;
+                case ' ':           e.preventDefault(); onPlay();   break;
                 case 'r': case 'R': e.preventDefault(); onRecord(); break;
                 case 'f': case 'F':
                     e.preventDefault();
@@ -864,12 +864,12 @@
         const cur    = parseInt(speedSlider ? speedSlider.value : '40', 10);
         const newVal = Math.max(1, Math.min(200, cur + delta));
 
-        if (speedSlider)      speedSlider.value      = newVal;
-        if (speedValue)       speedValue.textContent  = newVal;
-        if (speedHint)        speedHint.textContent   = getSpeedHint(newVal);
-        if (mobileSpeedSlider) mobileSpeedSlider.value = newVal;
-        if (mobileSpeedValue)  mobileSpeedValue.textContent = newVal;
-        if (mobileSpeedHint)   mobileSpeedHint.textContent  = getSpeedHint(newVal);
+        if (speedSlider)       speedSlider.value             = newVal;
+        if (speedValue)        speedValue.textContent         = newVal;
+        if (speedHint)         speedHint.textContent          = getSpeedHint(newVal);
+        if (mobileSpeedSlider) mobileSpeedSlider.value        = newVal;
+        if (mobileSpeedValue)  mobileSpeedValue.textContent   = newVal;
+        if (mobileSpeedHint)   mobileSpeedHint.textContent    = getSpeedHint(newVal);
 
         TypingEngine.configure({ speed: newVal });
         Toast.info(`Speed: ${newVal} chars/sec`, '', 1000);
@@ -883,37 +883,26 @@
     }
 
     // ============================================================
-    // FILE IMPORT
+    // FILE IMPORT — no size limit, no char limit
     // ============================================================
     function onFileImport(e) {
         const file = e.target.files[0];
         if (!file) return;
-
-        if (file.size > 500 * 1024) {
-            Toast.error('File too large. Max 500KB.');
-            fileImportInput.value = '';
-            return;
-        }
 
         const ext  = file.name.split('.').pop().toLowerCase();
         const lang = EXT_TO_LANG[ext] || 'plaintext';
 
         const reader = new FileReader();
         reader.onload = (ev) => {
-            let text = ev.target.result;
-            const MAX = 8000;
-            if (text.length > MAX) {
-                Toast.warning(`Truncated to ${MAX} chars`, 'Large File');
-                text = text.substring(0, MAX);
-            }
+            const text = ev.target.result;
 
             if (codeInput)       codeInput.value       = text;
             if (mobileCodeInput) mobileCodeInput.value = text;
 
-            if (languageSelect)              languageSelect.value = lang;
-            if ($d('mobileLanguageSelect'))  $d('mobileLanguageSelect').value = lang;
-            if (fileNameInput)               fileNameInput.value = file.name;
-            if ($d('mobileFileNameInput'))   $d('mobileFileNameInput').value = file.name;
+            if (languageSelect)             languageSelect.value             = lang;
+            if ($d('mobileLanguageSelect')) $d('mobileLanguageSelect').value = lang;
+            if (fileNameInput)              fileNameInput.value               = file.name;
+            if ($d('mobileFileNameInput'))  $d('mobileFileNameInput').value   = file.name;
 
             EditorUI.setLanguage(lang);
             EditorUI.setFileName(file.name);
@@ -952,8 +941,8 @@
 
         const lang     = getVal('languageSelect',    'mobileLanguageSelect');
         const fn       = getVal('fileNameInput',     'mobileFileNameInput');
-        const speed    = parseInt(getVal('speedSlider', 'mobileSpeedSlider'), 10) || 40;
-        const nlDelay  = parseInt(getVal('newlineDelay','mobileNewlineDelay'), 10) || 300;
+        const speed    = parseInt(getVal('speedSlider',    'mobileSpeedSlider'),    10) || 40;
+        const nlDelay  = parseInt(getVal('newlineDelay',   'mobileNewlineDelay'),   10) || 300;
         const theme    = getVal('themeSelect',       'mobileThemeSelect');
         const bg       = getVal('backgroundSelect',  'mobileBackgroundSelect');
         const cursor   = getVal('cursorStyleSelect', 'mobileCursorStyleSelect');
@@ -961,16 +950,16 @@
         const quality  = getVal('qualitySelect',     'mobileQualitySelect');
         const aspect   = getVal('aspectSelect',      'mobileAspectSelect');
         const format   = getVal('formatSelect',      'mobileFormatSelect');
-        const buffer   = parseFloat(getVal('endBufferSlider','mobileEndBufferSlider')) || 2;
+        const buffer   = parseFloat(getVal('endBufferSlider', 'mobileEndBufferSlider')) || 2;
 
-        const humanize = getChecked('humanizeToggle',  'mobileHumanizeToggle');
-        const mistake  = getChecked('mistakeToggle',   'mobileMistakeToggle');
-        const sound    = getChecked('soundToggle',     'mobileSoundToggle');
-        const minimap  = getChecked('minimapToggle',   'mobileMinimapToggle');
+        const humanize = getChecked('humanizeToggle', 'mobileHumanizeToggle');
+        const mistake  = getChecked('mistakeToggle',  'mobileMistakeToggle');
+        const sound    = getChecked('soundToggle',    'mobileSoundToggle');
+        const minimap  = getChecked('minimapToggle',  'mobileMinimapToggle');
 
-        const wmText   = getVal('watermarkInput',     'mobileWatermarkInput');
-        const wmPos    = getVal('watermarkPos',       'mobileWatermarkPos');
-        const wmOp     = parseFloat(getVal('watermarkOpacity','mobileWatermarkOpacity')) / 100;
+        const wmText = getVal('watermarkInput', 'mobileWatermarkInput');
+        const wmPos  = getVal('watermarkPos',   'mobileWatermarkPos');
+        const wmOp   = parseFloat(getVal('watermarkOpacity', 'mobileWatermarkOpacity')) / 100;
         const customBg = customBgColor ? customBgColor.value : '#000000';
 
         return {
@@ -1153,7 +1142,7 @@
     }
 
     // ============================================================
-    // ANIMATION ENGINE — UPDATED
+    // ANIMATION ENGINE
     // ============================================================
     function runAnimation(withRec, s) {
         if (!s) s = getCurrentSettings();
@@ -1201,7 +1190,6 @@
                 if (btnPlay)  btnPlay.disabled = withRec;
             },
 
-            // ---- UPDATED: now receives suggestion as 6th argument ----
             onTick: (li, cc, rev, tot, meta, suggestion) => {
                 if (meta && meta.isMistake) {
                     renderLineWithExtra(li, cc - 1, meta.wrongChar);
@@ -1261,7 +1249,6 @@
                 }
             },
 
-            // ---- NEW: enable suggestion system ----
             onSuggestion: true,
         });
 
@@ -1282,7 +1269,6 @@
         }
     }
 
-    // ---- UPDATED: accepts suggestion, shows ghost text ----
     function renderLine(li, cc, suggestion) {
         const num = li + 1;
         if (!EditorUI.getLineContent(num)) EditorUI.addLine(num);
@@ -1292,7 +1278,6 @@
             cc
         );
 
-        // Build ghost text — hidden during recording
         let ghostHTML = '';
         if (suggestion && suggestion.length > 0 && !isRecordMode) {
             const escaped = suggestion
@@ -1366,7 +1351,7 @@
 
     function hideRecUI() {
         if (recIndicator) recIndicator.classList.remove('active');
-        if (recInterval) { clearInterval(recInterval); recInterval = null; }
+        if (recInterval)  { clearInterval(recInterval); recInterval = null; }
     }
 
     // ============================================================
@@ -1484,35 +1469,35 @@
             if (!raw) return;
             const s = JSON.parse(raw);
 
-            if (s.language  && languageSelect)    languageSelect.value   = s.language;
-            if (s.fileName  && fileNameInput)      fileNameInput.value    = s.fileName;
-            if (s.speed     && speedSlider)        speedSlider.value      = s.speed;
-            if (s.nlDelay   && nlSlider)           nlSlider.value         = s.nlDelay;
+            if (s.language  && languageSelect)   languageSelect.value   = s.language;
+            if (s.fileName  && fileNameInput)     fileNameInput.value    = s.fileName;
+            if (s.speed     && speedSlider)       speedSlider.value      = s.speed;
+            if (s.nlDelay   && nlSlider)          nlSlider.value         = s.nlDelay;
             if (s.humanize  !== undefined && humanizeToggle)
-                humanizeToggle.checked  = s.humanize;
+                humanizeToggle.checked = s.humanize;
             if (s.mistake   !== undefined && mistakeToggle)
-                mistakeToggle.checked   = s.mistake;
+                mistakeToggle.checked  = s.mistake;
             if (s.sound     !== undefined && soundToggle)
-                soundToggle.checked     = s.sound;
+                soundToggle.checked    = s.sound;
             if (s.minimap   !== undefined && minimapToggle)
-                minimapToggle.checked   = s.minimap;
-            if (s.theme     && themeSelect)        themeSelect.value      = s.theme;
-            if (s.background && backgroundSelect)  backgroundSelect.value = s.background;
+                minimapToggle.checked  = s.minimap;
+            if (s.theme     && themeSelect)       themeSelect.value      = s.theme;
+            if (s.background && backgroundSelect) backgroundSelect.value = s.background;
             if (s.customBg  && customBgColor) {
                 customBgColor.value = s.customBg;
                 if (customBgHex) customBgHex.value = s.customBg;
             }
-            if (s.cursor    && cursorStyleSelect)  cursorStyleSelect.value = s.cursor;
-            if (s.fontSize  && fontSizeSelect)     fontSizeSelect.value    = s.fontSize;
-            if (s.quality   && qualitySelect)      qualitySelect.value     = s.quality;
-            if (s.aspect    && aspectSelect)       aspectSelect.value      = s.aspect;
-            if (s.buffer    && bufSlider)          bufSlider.value         = s.buffer;
-            if (s.wmText    && watermarkInput)     watermarkInput.value    = s.wmText;
-            if (s.wmPos     && watermarkPos)       watermarkPos.value      = s.wmPos;
+            if (s.cursor    && cursorStyleSelect) cursorStyleSelect.value = s.cursor;
+            if (s.fontSize  && fontSizeSelect)    fontSizeSelect.value    = s.fontSize;
+            if (s.quality   && qualitySelect)     qualitySelect.value     = s.quality;
+            if (s.aspect    && aspectSelect)      aspectSelect.value      = s.aspect;
+            if (s.buffer    && bufSlider)         bufSlider.value         = s.buffer;
+            if (s.wmText    && watermarkInput)    watermarkInput.value    = s.wmText;
+            if (s.wmPos     && watermarkPos)      watermarkPos.value      = s.wmPos;
             if (s.wmOp      && watermarkOpacity) {
-                const pct = Math.round(s.wmOp * 100);
-                watermarkOpacity.value = pct;
-                if (watermarkOpVal) watermarkOpVal.textContent = pct;
+                const p = Math.round(s.wmOp * 100);
+                watermarkOpacity.value = p;
+                if (watermarkOpVal) watermarkOpVal.textContent = p;
             }
 
             if (s.background === 'custom-color' && customBgGroup)
@@ -1557,8 +1542,8 @@
         const p = Math.min(100, Math.round(cur / tot * 100));
         const w = p + '%';
         const t = p + '%';
-        if (progressBar) progressBar.style.width = w;
-        if (progressTxt) progressTxt.textContent = t;
+        if (progressBar)    progressBar.style.width    = w;
+        if (progressTxt)    progressTxt.textContent    = t;
         if (mobileProgressBar) mobileProgressBar.style.width = w;
         if (mobileProgressTxt) mobileProgressTxt.textContent = t;
     }
@@ -1574,37 +1559,39 @@
         if (speedValue) speedValue.textContent = spd;
         if (speedHint)  speedHint.textContent  = getSpeedHint(+spd);
         const nl = nlSlider ? nlSlider.value : '300';
-        if (nlValue)    nlValue.textContent = nl;
+        if (nlValue)  nlValue.textContent  = nl;
         const buf = bufSlider ? bufSlider.value : '2';
-        if (bufValue)   bufValue.textContent = buf;
+        if (bufValue) bufValue.textContent = buf;
         if (watermarkOpVal && watermarkOpacity)
             watermarkOpVal.textContent = watermarkOpacity.value;
 
-        EditorUI.setFileName(fileNameInput ? fileNameInput.value : 'index.js');
+        EditorUI.setFileName(fileNameInput  ? fileNameInput.value  : 'index.js');
         EditorUI.setLanguage(languageSelect ? languageSelect.value : 'javascript');
     }
 
     function autoFileName() {
         const lang = languageSelect ? languageSelect.value : 'javascript';
         const name = AUTO_FILENAME[lang] || 'untitled';
-        if (fileNameInput)              fileNameInput.value = name;
+        if (fileNameInput)              fileNameInput.value             = name;
         if ($d('mobileFileNameInput'))  $d('mobileFileNameInput').value = name;
         EditorUI.setFileName(name);
     }
 
     function updateCodeMeta() {
-        const code  = codeInput ? codeInput.value : '';
-        const chars = code.length;
-        const lines = code ? code.split('\n').length : 0;
-        const spd   = parseInt(speedSlider ? speedSlider.value : '40', 10) || 40;
-        const est   = Math.round(chars / spd);
-        const timeStr = est < 60 ? `~${est}s` : `~${Math.floor(est/60)}m ${est%60}s`;
+        const code    = codeInput ? codeInput.value : '';
+        const chars   = code.length;
+        const lines   = code ? code.split('\n').length : 0;
+        const spd     = parseInt(speedSlider ? speedSlider.value : '40', 10) || 40;
+        const est     = Math.round(chars / spd);
+        const timeStr = est < 60
+            ? `~${est}s`
+            : `~${Math.floor(est / 60)}m ${est % 60}s`;
 
         const chStr = chars.toLocaleString() + ' chars';
         const liStr = lines + ' lines';
 
-        if (charCountEl)    charCountEl.textContent    = chStr;
-        if (lineCountEl)    lineCountEl.textContent    = liStr;
+        if (charCountEl)     charCountEl.textContent     = chStr;
+        if (lineCountEl)     lineCountEl.textContent     = liStr;
         if (estimatedTimeEl) estimatedTimeEl.textContent = timeStr;
         if (mobileCharCount) mobileCharCount.textContent = chStr;
         if (mobileLineCount) mobileLineCount.textContent = liStr;
@@ -1615,7 +1602,8 @@
 
     function waitFonts() {
         return (document.fonts && document.fonts.ready)
-            ? document.fonts.ready : wait(600);
+            ? document.fonts.ready
+            : wait(600);
     }
 
     let _debounceTimer = null;
